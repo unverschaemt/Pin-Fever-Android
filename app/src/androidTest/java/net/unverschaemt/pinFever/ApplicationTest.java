@@ -1,4 +1,4 @@
-package net.unverschaemt.pinit;
+package net.unverschaemt.pinFever;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
