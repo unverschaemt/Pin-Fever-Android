@@ -5,7 +5,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class Register extends ActionBarActivity {
@@ -14,14 +16,6 @@ public class Register extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        Intent intent = getIntent();
-        String userName = intent.getStringExtra(Login.USERNAME);
-        if(userName != null) {
-            EditText userNameTextField = (EditText) findViewById(R.id.Register_userName);
-            userNameTextField.setText(userName);
-            EditText emailTextField = (EditText) findViewById(R.id.Register_email);
-            emailTextField.requestFocus();
-        }
     }
 
     @Override
@@ -44,5 +38,14 @@ public class Register extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void changeAvatar(View view){
+        Toast.makeText(this, "TODO: Change Avatar", Toast.LENGTH_SHORT).show();
+    }
+
+    public void register(View view){
+        Toast.makeText(this, "TODO: Register", Toast.LENGTH_SHORT).show();
+
     }
 }

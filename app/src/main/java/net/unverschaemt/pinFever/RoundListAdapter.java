@@ -12,13 +12,13 @@ import android.widget.TextView;
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class GameListAdapter extends BaseAdapter{
-    private Game[] games = null;
+public class RoundListAdapter extends BaseAdapter{
+    final private Round[] rounds;
     private Context context;
     private static LayoutInflater inflater=null;
 
-    public GameListAdapter(Context context, Game[] games) {
-        this.games = games;
+    public RoundListAdapter(Context context, Round[] rounds) {
+        this.rounds = rounds;
         this.context=context;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -26,12 +26,12 @@ public class GameListAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return games.length;
+        return rounds.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return games[position];
+        return rounds[position];
     }
 
     @Override
@@ -41,10 +41,7 @@ public class GameListAdapter extends BaseAdapter{
 
     public class Holder
     {
-        TextView tvUserName;
-        ImageView imgAvatar;
-        TextView tvOwnScore;
-        TextView tvOpponentScore;
+        TextView tv;
     }
 
     @Override
@@ -52,19 +49,13 @@ public class GameListAdapter extends BaseAdapter{
         Holder holder=new Holder();
         View rowView;
         rowView = inflater.inflate(R.layout.game_list, null);
-        holder.tvUserName=(TextView) rowView.findViewById(R.id.GameList_opponentName);
-        holder.tvOwnScore=(TextView) rowView.findViewById(R.id.GameList_ownScore);
-        holder.tvOpponentScore=(TextView) rowView.findViewById(R.id.GameList_opponentScore);
-        holder.imgAvatar=(ImageView) rowView.findViewById(R.id.GameList_avatar);
-        holder.tvUserName.setText(games[position].getOpponentName());
-        holder.tvOwnScore.setText(games[position].getOwnScore()+"");
-        holder.tvOpponentScore.setText(games[position].getOpponentScore()+"");
-        holder.imgAvatar.setImageResource(games[position].getOpponentAvatar());
+        holder.tv=(TextView) rowView.findViewById(R.id.RoundList_roundNumber);
+        holder.tv.setText(R.string.round + " " + (position + 1));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), DetailView.class);
-                intent.putExtra(Home.GAME, games[position]);
+                Intent intent = new Intent(v.getContext(), RoundDetails.class);
+                intent.putExtra(DetailView.ROUND, rounds[position]);
                 v.getContext().startActivity(intent);
             }
         });
