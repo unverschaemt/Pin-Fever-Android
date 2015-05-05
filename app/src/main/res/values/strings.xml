@@ -28,4 +28,5 @@
     <string name="description_settings">settings</string>
     <string name="description_newGame">New Game</string>
     <string name="textView_activeGames">Active Games</string>
+    <string name="header_friends">Friends</string>
 </resources>
