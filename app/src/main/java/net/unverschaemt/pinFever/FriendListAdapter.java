@@ -41,8 +41,8 @@ public class FriendListAdapter extends BaseAdapter{
 
     public class Holder
     {
-        TextView tv;
-        ImageView img;
+        TextView tvUserName;
+        ImageView imgAvatar;
     }
 
     @Override
@@ -50,10 +50,10 @@ public class FriendListAdapter extends BaseAdapter{
         Holder holder=new Holder();
         View rowView;
         rowView = inflater.inflate(R.layout.friend_list, null);
-        holder.tv=(TextView) rowView.findViewById(R.id.FriendsList_userName);
-        holder.img=(ImageView) rowView.findViewById(R.id.GameList_avatar);
-        holder.tv.setText(friends[position].getUserName());
-        holder.img.setImageResource(friends[position].getAvatar());
+        holder.tvUserName =(TextView) rowView.findViewById(R.id.FriendsList_userName);
+        holder.imgAvatar =(ImageView) rowView.findViewById(R.id.FriendsList_avatar);
+        holder.tvUserName.setText(friends[position].getUserName());
+        holder.imgAvatar.setImageResource(friends[position].getAvatar());
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

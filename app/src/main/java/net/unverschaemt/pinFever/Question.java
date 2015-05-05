@@ -1,9 +1,11 @@
 package net.unverschaemt.pinFever;
 
+import java.io.Serializable;
+
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class Question {
+public class Question implements Serializable{
     private String id;
     private String category;
     private String question;

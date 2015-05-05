@@ -2,18 +2,19 @@ package net.unverschaemt.pinFever;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by D060338 on 05.05.2015.
  */
 public class Round implements Serializable{
-    private Collection<Question> questions;
+    private List<Question> questions;
 
-    public Round(Collection<Question> questions){
+    public Round(List<Question> questions){
         this.questions = questions;
     }
 
-    public Collection<Question> getQuestions(){
+    public List<Question> getQuestions(){
         return questions;
     }
 

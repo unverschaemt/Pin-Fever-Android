@@ -29,14 +29,17 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false" />
 
-    <net.unverschaemt.pinFever.RoundImageButton
+    <net.unverschaemt.pinFever.CircularImageButton
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:id="@+id/Home_avatar"
         android:layout_centerHorizontal="true"
-        android:background="@mipmap/dummy_avatar"
+        android:background="@drawable/circle"
         android:onClick="changeAvatar"
-        android:contentDescription="@string/description_avatar" />
+        android:contentDescription="@string/description_avatar"
+        android:src="@mipmap/dummy_avatar"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:layout_width="wrap_content"

@@ -11,7 +11,7 @@ public class RoundDetails extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_round);
+        setContentView(R.layout.activity_round_details);
     }
 
     @Override

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 public class Home extends ActionBarActivity {
@@ -47,8 +48,8 @@ public class Home extends ActionBarActivity {
         games[9] = new Game("803nc8cn27", u10);
 
         for(Game game : games){
-            Collection<Question> questions;
-            Collection<Round> rounds = new ArrayList<Round>();
+            List<Question> questions;
+            List<Round> rounds = new ArrayList<Round>();
             questions = new ArrayList<Question>();
             questions.add(new Question("idn983nbd9", "Science", "Was ist...", 2, 1));
             questions.add(new Question("98zho3nr98", "Science", "Wo ist...", 1, 1));

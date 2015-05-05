@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:weightSum="1">
 
-        <net.unverschaemt.pinFever.RoundImageButton
+        <net.unverschaemt.pinFever.CircularImageButton
             android:layout_width="150dp"
             android:layout_height="180dp"
             android:id="@+id/avatarSelector"

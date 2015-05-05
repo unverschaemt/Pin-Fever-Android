@@ -29,4 +29,8 @@
     <string name="description_newGame">New Game</string>
     <string name="textView_activeGames">Active Games</string>
     <string name="header_friends">Friends</string>
+    <string name="header_detailView">Detail View</string>
+    <string name="revanche">Revanche</string>
+    <string name="round">Round</string>
+    <string name="question">Question</string>
 </resources>

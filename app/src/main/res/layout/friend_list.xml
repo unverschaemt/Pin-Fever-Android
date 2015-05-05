@@ -4,16 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <ImageView
+    <net.unverschaemt.pinFever.CircularImageView
         android:id="@+id/FriendsList_avatar"
         android:layout_gravity="center"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@mipmap/dummy_avatar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="20dp" />
+        android:background="@drawable/circle"
+        android:scaleType="centerCrop" />
 
     <TextView
     android:id="@+id/FriendsList_userName"

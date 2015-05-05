@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by D060338 on 05.05.2015.
@@ -13,7 +14,7 @@ import java.util.HashMap;
 public class Game implements Serializable{
     final private String id;
     private User opponent;
-    private Round[] rounds;
+    private List<Round> rounds;
     private boolean finished = false;
 
     public Game(String id, User opponent){
@@ -31,16 +32,11 @@ public class Game implements Serializable{
         return id;
     }
 
-    public void addRounds(Collection<Round> rounds){
-        this.rounds = new Round[rounds.size()];
-        int i= 0;
-        for(Round round : rounds){
-            this.rounds[i] = round;
-            i++;
-        }
+    public void addRounds(List<Round> rounds){
+        this.rounds = rounds;
     }
 
-    public Round[] getRounds() {
+    public List<Round> getRounds() {
         return rounds;
     }
 
