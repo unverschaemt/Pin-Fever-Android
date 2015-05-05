@@ -15,12 +15,13 @@
         android:layout_alignParentTop="true"
         android:weightSum="1">
 
-        <ImageButton
+        <net.unverschaemt.pinFever.RoundImageButton
             android:layout_width="150dp"
             android:layout_height="180dp"
             android:id="@+id/avatarSelector"
             android:layout_gravity="center_horizontal"
             android:background="@mipmap/dummy_avatar"
+            android:onClick="changeAvatar"
             android:contentDescription="@string/description_avatar"
             android:layout_alignParentTop="false"
             android:layout_centerHorizontal="true" />

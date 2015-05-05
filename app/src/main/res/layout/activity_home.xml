@@ -11,8 +11,8 @@
         android:layout_height="40dp"
         android:id="@+id/Home_settings"
         android:background="@mipmap/settings"
+        android:onClick="settings"
         android:contentDescription="@string/description_settings"
-        android:layout_alignParentStart="false"
         android:focusableInTouchMode="false"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
@@ -22,18 +22,20 @@
         android:layout_height="40dp"
         android:id="@+id/Home_friends"
         android:background="@mipmap/friends"
+        android:onClick="friends"
         android:contentDescription="@string/description_settings"
         android:focusableInTouchMode="false"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false" />
 
-    <ImageButton
+    <net.unverschaemt.pinFever.RoundImageButton
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:id="@+id/Home_avatar"
         android:layout_centerHorizontal="true"
         android:background="@mipmap/dummy_avatar"
+        android:onClick="changeAvatar"
         android:contentDescription="@string/description_avatar" />
 
     <TextView
@@ -61,6 +63,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/Home_newGame"
+        android:onClick="newGame"
         android:layout_below="@+id/Home_score"
         android:layout_alignParentRight="true"
         android:contentDescription="@string/description_newGame"
@@ -71,7 +74,6 @@
         android:layout_height="match_parent"
         android:id="@+id/Home_activeGames"
         android:smoothScrollbar="false"
-        android:layout_alignParentEnd="false"
         android:layout_below="@+id/Home_textView_activeGames" />
 
 </RelativeLayout>
