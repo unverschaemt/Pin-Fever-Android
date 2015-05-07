@@ -1,21 +1,19 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
-public class Home extends ActionBarActivity {
+public class Home extends Activity {
     public final static String GAME = "net.unverschaemt.PinFever.GAME";
 
     @Override

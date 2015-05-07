@@ -1,4 +1,4 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
 import android.content.Context;
 import android.content.Intent;

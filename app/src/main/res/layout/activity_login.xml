@@ -4,37 +4,86 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="net.unverschaemt.pinFever.Login">
+    tools:context="net.unverschaemt.pinfever.Login">
 
     <RelativeLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="1"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <net.unverschaemt.pinFever.CircularImageView
-            android:layout_width="130dp"
-            android:layout_height="130dp"
-            android:id="@+id/imageView"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/circle"
-            android:contentDescription="@string/description_logo"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:src="@mipmap/logo"
-            android:scaleType="centerCrop" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
-        <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-            android:text="@string/button_LoginGoogle"
-        android:id="@+id/Login_loginGooglePlus"
-            android:onClick="login"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
+            <net.unverschaemt.pinfever.CircularImageView
+                android:layout_width="160dp"
+                android:layout_height="150dp"
+                android:id="@+id/imageView"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/circle"
+                android:contentDescription="@string/description_logo"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/logo"
+                android:scaleType="centerCrop" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/Login_userName"
+                android:hint="@string/placeholder_Username"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:id="@+id/Login_password"
+                android:hint="@string/placeholder_Password"
+                android:layout_below="@+id/Login_userName"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/Login_password">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/button_Login"
+                    android:id="@+id/Login_login"
+                    android:onClick="login" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/button_Register"
+                    android:id="@+id/Login_register"
+                    android:onClick="register" />
+            </RelativeLayout>
+
+            <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+                android:text="@string/button_LoginGoogle"
+            android:id="@+id/Login_loginGooglePlus"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="true" />
+        </RelativeLayout>
 </RelativeLayout>

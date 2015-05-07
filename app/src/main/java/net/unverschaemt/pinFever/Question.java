@@ -1,4 +1,4 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
 import java.io.Serializable;
 

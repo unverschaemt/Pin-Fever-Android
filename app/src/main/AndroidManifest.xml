@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.unverschaemt.pinFever" >
+    package="net.unverschaemt.pinfever" >
 
     <application
         android:allowBackup="true"
@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".Login"
+            android:name="net.unverschaemt.pinfever.Login"
             android:label="@string/title_activity_login" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -16,48 +16,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Register"
+            android:name="net.unverschaemt.pinfever.Register"
             android:label="@string/title_activity_register" >
         </activity>
         <activity
-            android:name=".Home"
+            android:name="net.unverschaemt.pinfever.Home"
             android:label="@string/title_activity_home" >
         </activity>
         <activity
-            android:name=".Profile"
+            android:name="net.unverschaemt.pinfever.Profile"
             android:label="@string/title_activity_profile" >
         </activity>
         <activity
-            android:name=".HallOfFame"
+            android:name="net.unverschaemt.pinfever.HallOfFame"
             android:label="@string/title_activity_hall_of_fame" >
         </activity>
         <activity
-            android:name=".NewGame"
+            android:name="net.unverschaemt.pinfever.NewGame"
             android:label="@string/title_activity_new_game" >
         </activity>
         <activity
-            android:name=".FriendsList"
+            android:name="net.unverschaemt.pinfever.FriendsList"
             android:label="@string/title_activity_friends_list" >
         </activity>
         <activity
-            android:name=".Settings"
+            android:name="net.unverschaemt.pinfever.Settings"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".DetailView"
+            android:name="net.unverschaemt.pinfever.DetailView"
             android:label="@string/title_activity_detail_view" >
         </activity>
         <activity
-            android:name=".HallTrophy"
+            android:name="net.unverschaemt.pinfever.HallTrophy"
             android:label="@string/title_activity_hall_trophy" >
         </activity>
         <activity
-            android:name=".Map"
+            android:name="net.unverschaemt.pinfever.Map"
             android:label="@string/title_activity_map" >
-        </activity>
-        <activity
-            android:name=".RoundDetails"
-            android:label="@string/title_activity_round" >
         </activity>
     </application>
 

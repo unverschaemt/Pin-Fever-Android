@@ -1,11 +1,6 @@
-package net.unverschaemt.pinFever;
-
-import android.widget.ImageView;
+package net.unverschaemt.pinfever;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 /**

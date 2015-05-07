@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="net.unverschaemt.pinFever.Home">
+    tools:context="net.unverschaemt.pinfever.Home">
 
     <ImageButton
         android:layout_width="40dp"
@@ -29,7 +29,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false" />
 
-    <net.unverschaemt.pinFever.CircularImageButton
+    <net.unverschaemt.pinfever.CircularImageButton
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:id="@+id/Home_avatar"

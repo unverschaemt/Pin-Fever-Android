@@ -1,4 +1,4 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 /**

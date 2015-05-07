@@ -1,7 +1,7 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,12 +10,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class Register extends ActionBarActivity {
+public class Register extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        Intent intent = getIntent();
+        String userName = intent.getStringExtra(Login.USERNAME);
+        EditText etUserName = (EditText)findViewById(R.id.Register_userName);
+        etUserName.setText(userName);
     }
 
     @Override

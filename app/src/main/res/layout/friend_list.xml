@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <net.unverschaemt.pinFever.CircularImageView
+    <net.unverschaemt.pinfever.CircularImageView
         android:id="@+id/FriendsList_avatar"
         android:layout_gravity="center"
         android:layout_width="48dp"

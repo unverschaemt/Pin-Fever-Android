@@ -1,6 +1,6 @@
-package net.unverschaemt.pinFever;
+package net.unverschaemt.pinfever;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,7 +9,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class FriendsList extends ActionBarActivity {
+public class FriendsList extends Activity {
     public final static String USER = "net.unverschaemt.PinIt.USER";
 
     @Override
