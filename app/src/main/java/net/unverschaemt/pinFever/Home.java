@@ -94,7 +94,7 @@ public class Home extends Activity {
     }
 
     public void changeAvatar(View view){
-        Toast.makeText(this, "TODO: Change Avatar", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "TODO: Show Profile", Toast.LENGTH_SHORT).show();
     }
 
     public void settings(View view){
