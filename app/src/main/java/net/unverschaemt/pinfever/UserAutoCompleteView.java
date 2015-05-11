@@ -17,14 +17,17 @@ import com.tokenautocomplete.TokenCompleteTextView;
 public class UserAutoCompleteView extends TokenCompleteTextView {
     public UserAutoCompleteView(Context context) {
         super(context);
+        allowDuplicates(false);
     }
 
     public UserAutoCompleteView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        allowDuplicates(false);
     }
 
     public UserAutoCompleteView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        allowDuplicates(false);
     }
 
     @Override
