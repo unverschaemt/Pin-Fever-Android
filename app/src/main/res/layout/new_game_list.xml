@@ -5,8 +5,8 @@
     android:gravity="center_horizontal">
 
     <net.unverschaemt.pinfever.CircularImageButton
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/NewGameList_avatar"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/circle"
