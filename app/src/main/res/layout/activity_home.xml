@@ -22,7 +22,7 @@
         android:layout_height="40dp"
         android:id="@+id/Home_friends"
         android:background="@mipmap/friends"
-        android:onClick="friends"
+        android:onClick="user"
         android:contentDescription="@string/description_settings"
         android:focusableInTouchMode="false"
         android:layout_alignParentTop="true"
