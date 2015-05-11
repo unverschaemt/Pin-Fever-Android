@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class NewGame extends Activity {
     ArrayAdapter<User> adapter;
+    private UserAutoCompleteView completionView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,14 +25,17 @@ public class NewGame extends Activity {
 
     private void fillGridLayout() {
         List<User> user = getUser();
+        completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         GridView layout = (GridView)findViewById(R.id.NewGame_gridLayout);
-        layout.setAdapter(new NewGameGridAdapter(this, user));
+        layout.setAdapter(new NewGameGridAdapter(this, user, completionView));
 
         adapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, user);
-
-
-        UserAutoCompleteView completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         completionView.setAdapter(adapter);
+
+    }
+
+    public UserAutoCompleteView getCompletionView(){
+        return completionView;
     }
 
     private List<User> getUser() {

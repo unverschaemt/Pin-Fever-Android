@@ -18,11 +18,13 @@ public class NewGameGridAdapter extends BaseAdapter {
 
     private final List<User> user;
     private final LayoutInflater inflater;
+    private final UserAutoCompleteView completionView;
 
-    public NewGameGridAdapter(Context context, List<User> user){
+    public NewGameGridAdapter(Context context, List<User> user, UserAutoCompleteView completionView){
         this.user = user;
         inflater = (LayoutInflater)context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.completionView = completionView;
     }
     
     @Override
@@ -47,7 +49,7 @@ public class NewGameGridAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         Holder holder=new Holder();
         View rowView;
         rowView = inflater.inflate(R.layout.new_game_list, null);
@@ -58,6 +60,7 @@ public class NewGameGridAdapter extends BaseAdapter {
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                completionView.addObject(user.get(position));
             }
         });
         return rowView;
