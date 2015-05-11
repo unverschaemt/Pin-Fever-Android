@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':TokenAutoComplete'
+project(':TokenAutoComplete').projectDir = new File('libs/TokenAutoComplete')
