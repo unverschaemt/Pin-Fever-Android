@@ -1,18 +1,22 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+
+import com.tokenautocomplete.TokenCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class NewGame extends Activity {
+public class NewGame extends Activity implements TokenCompleteTextView.TokenListener{
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
 
@@ -20,12 +24,14 @@ public class NewGame extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
+        completionView.setTokenListener(this);
         fillGridLayout();
     }
 
     private void fillGridLayout() {
         List<User> user = getUser();
-        completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         GridView layout = (GridView)findViewById(R.id.NewGame_gridLayout);
         layout.setAdapter(new NewGameGridAdapter(this, user, completionView));
 
@@ -76,5 +82,22 @@ public class NewGame extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTokenAdded(Object o) {
+        View popup = findViewById(R.id.NewGame_popup);
+        popup.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onTokenRemoved(Object o) {
+        View popup = findViewById(R.id.NewGame_popup);
+        popup.setVisibility(View.GONE);
+    }
+
+    public void start(View view){
+        Intent intent = new Intent(this, Map.class);
+        startActivity(intent);
     }
 }

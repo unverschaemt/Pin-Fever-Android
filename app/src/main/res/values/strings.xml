@@ -33,4 +33,6 @@
     <string name="revanche">Revanche</string>
     <string name="round">Round</string>
     <string name="question">Question</string>
+    <string name="startGame">Start Game</string>
+    <string name="start">Start</string>
 </resources>

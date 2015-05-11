@@ -22,5 +22,30 @@
         android:id="@+id/NewGame_gridLayout"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/NewGame_participants"
-        android:numColumns="3" />
+        android:numColumns="3"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/NewGame_popup"
+        android:background="@color/ripple_material_light"
+        android:visibility="gone"
+        android:alpha="0.8">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start"
+            android:id="@+id/NewGame_start"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:onClick="start"
+            android:singleLine="true" />
+    </RelativeLayout>
 </RelativeLayout>
