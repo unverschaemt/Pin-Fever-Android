@@ -6,13 +6,15 @@ import java.io.Serializable;
  * Created by D060338 on 05.05.2015.
  */
 public class User implements Serializable{
+
     String userName;
-    String id;
+    long id;
     String name;
     String email;
+    int score;
     int avatar;
 
-    public User(String id, String userName, String name, String email, int avatar){
+    public User(long id, String userName, String name, String email, int avatar){
         this.id = id;
         this.userName = userName;
         this.avatar = avatar;
@@ -20,18 +22,61 @@ public class User implements Serializable{
         this.email = email;
     }
 
+    public User(){
+
+    }
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public int getScore(){
+        return score;
+    }
+
+    public void setScore(int score){
+        this.score = score;
+    }
+
     public int getAvatar() {
         return avatar;
     }
 
-    public String getUserName() {
-        return userName;
+    public void setAvatar(int avatar) {
+        this.avatar = avatar;
     }
 
     @Override
     public String toString(){
         return userName;
     }
-
-
 }

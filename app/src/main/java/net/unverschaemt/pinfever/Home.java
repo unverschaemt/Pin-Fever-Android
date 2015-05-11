@@ -21,18 +21,18 @@ public class Home extends Activity {
         super.onCreate(savedInstanceState);
 
         /*TODO: Remove! Only For Testing*/
-        User ownUser = new User("982n3o98uch", "Kkoile", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User ownUser = new User(73983, "Kkoile", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
         Game[] games = new Game[10];
-        User u1 = new User("98hzo2in3re", "Peter", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u2 = new User("dn98znx98zn", "Robin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u3 = new User("98znx98u3n0", "Dehlen", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u4 = new User("09u7nx9n82n", "Dustin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u5 = new User("98724nc97xj", "Hex0r", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u6 = new User("576nx982nsz", "Pottsau", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u7 = new User("323nx9x9732", "Zettel", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u8 = new User("9834nc09x20", "Kaputt", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u9 = new User("c29873nmj02", "Uboot", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        User u10 = new User("woieun22zei", "Hase", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u1 = new User(8744872, "Peter", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u2 = new User(9879833, "Robin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u3 = new User(8734784, "Dehlen", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u4 = new User(747839, "Dustin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u5 = new User(8732983, "Hex0r", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u6 = new User(274949, "Pottsau", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u7 = new User(763719, "Zettel", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u8 = new User(32748489, "Kaputt", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u9 = new User(2737494, "Uboot", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
+        User u10 = new User(273847984, "Hase", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
 
         games[0] = new Game("987d3c87hd", u1);
         games[1] = new Game("98fnf8720a", u2);

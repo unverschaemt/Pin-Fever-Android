@@ -1,35 +1,32 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FriendsList extends Activity {
-    public final static String USER = "net.unverschaemt.PinIt.USER";
+    public final static String USER = "net.unverschaemt.pinfever.USER";
+    private List<User> friends;
+    private FriendsDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_list);
+        dataSource = new FriendsDataSource(this);
+        dataSource.open();
+        friends = dataSource.getAllFriends();
 
-        /*TODO: Remove! Only For Testing*/
-        User[] friends = new User[10];
-        friends[0] = new User("98hzo2in3re", "Peter", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[1] = new User("dn98znx98zn", "Robin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[2] = new User("98znx98u3n0", "Dehlen", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[3] = new User("09u7nx9n82n", "Dustin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[4] = new User("98724nc97xj", "Hex0r", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[5] = new User("576nx982nsz", "Pottsau", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[6] = new User("323nx9x9732", "Zettel", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[7] = new User("9834nc09x20", "Kaputt", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[8] = new User("c29873nmj02", "Uboot", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        friends[9] = new User("woieun22zei", "Hase", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar);
-        /*****/
         fillFriendsList(friends);
 
     }
@@ -57,10 +54,41 @@ public class FriendsList extends Activity {
     }
 
     public void addFriend(View view){
-        Toast.makeText(this, "TODO: Add Friend", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle(getString(R.string.addFriend));
+        alert.setMessage(getString(R.string.message_addFriend));
+
+        final EditText input = new EditText(this);
+        alert.setView(input);
+
+        alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = input.getText().toString();
+                //TODO: check if user exists. If so send user information. Else error message
+                /*only for testing*/
+                long id = Math.round(Math.random()*10000);
+                saveFriendInternally(id, value ,20, R.mipmap.dummy_avatar);
+                fillFriendsList(friends);
+                /*****/
+            }
+        });
+
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
     }
 
-    public void fillFriendsList(User[] friends){
+    private void saveFriendInternally(long id, String userName, int score, int avatar){
+        User newFriend = dataSource.createFriend(id, userName, score, avatar);
+        friends.add(newFriend);
+    }
+
+    public void fillFriendsList(List<User> friends){
         ListView friendsList = (ListView) findViewById(R.id.FriendsList_friends);
         friendsList.setAdapter(new FriendListAdapter(this, friends));
     }
