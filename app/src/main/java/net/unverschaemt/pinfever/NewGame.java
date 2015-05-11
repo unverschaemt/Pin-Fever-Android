@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 
 public class NewGame extends Activity {
+    ArrayAdapter<User> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,12 @@ public class NewGame extends Activity {
         List<User> user = getUser();
         GridView layout = (GridView)findViewById(R.id.NewGame_gridLayout);
         layout.setAdapter(new NewGameGridAdapter(this, user));
+
+        adapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, user);
+
+
+        UserAutoCompleteView completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
+        completionView.setAdapter(adapter);
     }
 
     private List<User> getUser() {

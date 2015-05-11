@@ -28,5 +28,10 @@ public class User implements Serializable{
         return userName;
     }
 
+    @Override
+    public String toString(){
+        return userName;
+    }
+
 
 }
