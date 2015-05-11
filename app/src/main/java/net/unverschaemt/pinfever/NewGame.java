@@ -88,15 +88,26 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     public void onTokenAdded(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
         popup.setVisibility(View.VISIBLE);
+        View randomGame = findViewById(R.id.NewGame_randomGame);
+        randomGame.setVisibility(View.GONE);
+
     }
 
     @Override
     public void onTokenRemoved(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
-        popup.setVisibility(View.GONE);
+        if(completionView.getObjects().size()==0) {
+            popup.setVisibility(View.GONE);
+            View randomGame = findViewById(R.id.NewGame_randomGame);
+            randomGame.setVisibility(View.VISIBLE);
+        }
     }
 
     public void start(View view){
+        Intent intent = new Intent(this, Map.class);
+        startActivity(intent);
+    }
+    public void randomGame(View view){
         Intent intent = new Intent(this, Map.class);
         startActivity(intent);
     }
