@@ -44,6 +44,6 @@ public class UserAutoCompleteView extends TokenCompleteTextView {
     @Override
     protected Object defaultObject(String completionText) {
         //TODO: looking for error handling or looking on server, whether user exists
-        return new User(98029, completionText, completionText, completionText, R.mipmap.dummy_avatar);
+        return new User();
     }
 }

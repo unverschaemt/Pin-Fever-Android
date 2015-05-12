@@ -29,7 +29,7 @@ public class DetailView extends Activity {
         setScore(game.getOwnScore(), game.getOpponentScore());
         ExpandableListView roundsList = (ExpandableListView) findViewById(R.id.DetailView_rounds);
         roundsList.setAdapter(new RoundListAdapter(this, game.getRounds()));
-        if(game.isFinished()){
+        if(game.getState() == 3){
             Button revenge = (Button) findViewById(R.id.DetailView_revenge);
             revenge.setVisibility(View.VISIBLE);
         }

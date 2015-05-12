@@ -10,23 +10,22 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class FriendsList extends Activity {
     public final static String USER = "net.unverschaemt.pinfever.USER";
     private List<User> friends;
-    private FriendsDataSource dataSource;
+    private DataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_list);
-        dataSource = new FriendsDataSource(this);
+        dataSource = new DataSource(this);
         dataSource.open();
         friends = dataSource.getAllFriends();
-
+        dataSource.close();
         fillFriendsList(friends);
 
     }
@@ -84,7 +83,9 @@ public class FriendsList extends Activity {
     }
 
     private void saveFriendInternally(long id, String userName, int score, int avatar){
+        dataSource.open();
         User newFriend = dataSource.createFriend(id, userName, score, avatar);
+        dataSource.close();
         friends.add(newFriend);
     }
 

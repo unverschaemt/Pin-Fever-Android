@@ -2,6 +2,7 @@ package net.unverschaemt.pinfever;
 
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Telephony;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,15 +10,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by D060338 on 05.05.2015.
  */
 public class GameListAdapter extends BaseAdapter{
-    private Game[] games = null;
+    private List<Game> games = null;
     private Context context;
     private static LayoutInflater inflater=null;
 
-    public GameListAdapter(Context context, Game[] games) {
+    public GameListAdapter(Context context, List<Game> games) {
         this.games = games;
         this.context=context;
         inflater = ( LayoutInflater )context.
@@ -26,12 +29,12 @@ public class GameListAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return games.length;
+        return games.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return games[position];
+        return games.get(position);
     }
 
     @Override
@@ -56,18 +59,33 @@ public class GameListAdapter extends BaseAdapter{
         holder.tvOwnScore=(TextView) rowView.findViewById(R.id.GameList_ownScore);
         holder.tvOpponentScore=(TextView) rowView.findViewById(R.id.GameList_opponentScore);
         holder.imgAvatar=(ImageView) rowView.findViewById(R.id.GameList_avatar);
-        holder.tvUserName.setText(games[position].getOpponentName());
-        holder.tvOwnScore.setText(games[position].getOwnScore()+"");
-        holder.tvOpponentScore.setText(games[position].getOpponentScore()+"");
-        holder.imgAvatar.setImageResource(games[position].getOpponentAvatar());
+        List<Participant> participants = games.get(position).getParticipants();
+        Participant participant = getOtherParticipant(participants);
+        User userFromParticipant = getUserFromId(participant.getPlayer());
+        holder.tvUserName.setText(userFromParticipant.getUserName());
+        holder.tvOwnScore.setText(games.get(position).getOwnScore()+"");
+        holder.tvOpponentScore.setText(games.get(position).getOpponentScore()+"");
+        holder.imgAvatar.setImageResource(userFromParticipant.getAvatar());
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DetailView.class);
-                intent.putExtra(Home.GAME, games[position]);
+                intent.putExtra(Home.GAME, games.get(position));
                 v.getContext().startActivity(intent);
             }
         });
         return rowView;
+    }
+
+    private Participant getOtherParticipant(List<Participant> participants){
+        for (Participant participant : participants){
+            if(participant.getPlayer() != Home.ownUser.getId()){
+                return participant;
+            }
+        }
+        return null;
+    }
+    private User getUserFromId(long id) {
+        return null;
     }
 }

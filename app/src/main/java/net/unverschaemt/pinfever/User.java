@@ -14,14 +14,6 @@ public class User implements Serializable{
     int score;
     int avatar;
 
-    public User(long id, String userName, String name, String email, int avatar){
-        this.id = id;
-        this.userName = userName;
-        this.avatar = avatar;
-        this.name  = name;
-        this.email = email;
-    }
-
     public User(){
 
     }

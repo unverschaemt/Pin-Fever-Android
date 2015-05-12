@@ -45,20 +45,10 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     }
 
     private List<User> getUser() {
-        //TODO implement choice of user to display
-        /* only for testing*/
-        List<User> user = new ArrayList<User>();
-        user.add(new User(98402, "Peter", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(92809, "Robin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(29837, "Dehlen", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(3293, "Dustin", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(783498, "Hex0r", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(298738, "Pottsau", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(89739, "Zettel", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(827398, "Kaputt", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(89927, "Uboot", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        user.add(new User(29873, "Hase", "Nils Hirsekorn", "Nils_Hirsekorn@online.de", R.mipmap.dummy_avatar));
-        /******/
+        DataSource dataSource = new DataSource(this);
+        dataSource.open();
+        List<User> user = dataSource.getAllFriends();
+        dataSource.close();
         return user;
     }
 

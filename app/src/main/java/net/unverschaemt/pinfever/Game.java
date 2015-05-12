@@ -1,33 +1,32 @@
 package net.unverschaemt.pinfever;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class Game implements Serializable{
-    final private String id;
-    private User opponent;
+public class Game implements Serializable {
+    private long id;
     private List<Round> rounds;
-    private boolean finished = false;
+    private int state;
+    private long activeRound = -1;
+    private List<Participant> participants;
 
-    public Game(String id, User opponent){
-        this.id = id;
-        this.opponent = opponent;
+    public Game() {
+
     }
 
-    public String getOpponentName() {
-        return opponent.getUserName();
-    }
-    public int getOpponentAvatar() {
-        return opponent.getAvatar();
-    }
-    public String getID() {
+    public long getId() {
         return id;
     }
 
-    public void addRounds(List<Round> rounds){
+    public void setID(long id) {
+        this.id = id;
+    }
+
+    public void setRounds(List<Round> rounds) {
         this.rounds = rounds;
     }
 
@@ -37,7 +36,7 @@ public class Game implements Serializable{
 
     public int getOwnScore() {
         int ownScore = 0;
-        for (Round round : rounds){
+        for (Round round : rounds) {
             ownScore += round.getOwnScore();
         }
         return ownScore;
@@ -51,11 +50,27 @@ public class Game implements Serializable{
         return opponentScore;
     }
 
-    public boolean isFinished() {
-        return finished;
+    public long getActiveRound() {
+        return activeRound;
     }
 
-    public void setFinished(boolean finished) {
-        this.finished = finished;
+    public void setActiveRound(long activeRound) {
+        this.activeRound = activeRound;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public List<Participant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Participant> participants) {
+        this.participants = participants;
     }
 }
