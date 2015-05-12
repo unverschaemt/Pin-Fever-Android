@@ -40,4 +40,5 @@
     <string name="message_addFriend">Type in the username of your friend:</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+    <string name="userName_random">Random</string>
 </resources>
