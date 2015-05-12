@@ -50,8 +50,9 @@ public class Home extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void changeAvatar(View view){
-        Toast.makeText(this, "TODO: Show Profile", Toast.LENGTH_SHORT).show();
+    public void showProfile(View view){
+        Intent intent = new Intent(this, Profile.class);
+        startActivity(intent);
     }
 
     public void settings(View view){

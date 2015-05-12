@@ -6,7 +6,16 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="net.unverschaemt.pinfever.Profile">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <net.unverschaemt.pinfever.CircularImageButton
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:id="@+id/Profile_avatar"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/circle"
+        android:onClick="changeAvatar"
+        android:contentDescription="@string/description_avatar"
+        android:src="@drawable/change_avatar"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop" />
 
 </RelativeLayout>

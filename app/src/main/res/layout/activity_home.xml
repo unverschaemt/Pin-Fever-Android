@@ -35,7 +35,7 @@
         android:id="@+id/Home_avatar"
         android:layout_centerHorizontal="true"
         android:background="@drawable/circle"
-        android:onClick="changeAvatar"
+        android:onClick="showProfile"
         android:contentDescription="@string/description_avatar"
         android:src="@mipmap/dummy_avatar"
         android:cropToPadding="false"
