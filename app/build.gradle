@@ -22,4 +22,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.1.1'
-    compile "com.splitwise:tokenautocomplete:1.3.3@aar"}
+    compile "com.splitwise:tokenautocomplete:1.3.3@aar"
+    compile 'org.osmdroid:osmdroid-android:4.2'
+    compile 'org.slf4j:slf4j-simple:1.6.1'
+}
+
