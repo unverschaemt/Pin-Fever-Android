@@ -53,4 +53,15 @@
             android:onClick="toggleQuestionVisibility" />
     </FrameLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/submit"
+        android:id="@+id/Map_submit"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="submitGuess"
+        android:visibility="gone" />
+
 </RelativeLayout>

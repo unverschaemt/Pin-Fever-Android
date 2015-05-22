@@ -31,7 +31,7 @@ public class Map extends Activity {
     private Question question = null;
     private boolean showingQuestion = false;
     MapView mapView;
-    final private int guessMarker = 1;
+    private GeoPoint guess = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +63,7 @@ public class Map extends Activity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     Projection proj = mapView.getProjection();
                     GeoPoint point = (GeoPoint) proj.fromPixels((int) event.getX(), (int) event.getY());
+                    guess = point;
                     setGuessMarker(point);
                     return true;
                 }
@@ -72,9 +73,16 @@ public class Map extends Activity {
 
     }
 
+    public void submitGuess(View view){
+        GeoPoint guess = this.guess;
+        //TODO: send guess to server
+        //TODO: getNext Question
+    }
+
     private void setGuessMarker(GeoPoint point) {
         mapView.getOverlays().clear();
         addMarker(point);
+        findViewById(R.id.Map_submit).setVisibility(View.VISIBLE);
     }
 
     private void addMarker(GeoPoint point){
