@@ -5,25 +5,29 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.TilesOverlay;
 
 
 public class Map extends Activity {
-
+    private Question question = null;
+    private boolean showingQuestion = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        question = getQuestion();
+        TextView questionTextView = (TextView) findViewById(R.id.Map_questionText);
+        questionTextView.setText(question.getText());
+        toggleQuestionVisibility(null);
 
         MapView mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(false);
@@ -38,6 +42,28 @@ public class Map extends Activity {
         tilesOverlay.setLoadingBackgroundColor(Color.WHITE);
         mapView.getOverlays().add(tilesOverlay);
 
+    }
+
+    private Question getQuestion() {
+        Question question = new Question();
+        question.setText("Where were the olympic games set in 2012?");
+        float lat = (float) 51.3030;
+        float longAnswer = (float) 0.0732;
+        question.setAnswerLat((float) 51.3030);
+        question.setAnswerLong((float) 0.0732);
+        return question;
+    }
+
+    public void toggleQuestionVisibility(View view) {
+        int visibility;
+        if(showingQuestion){
+            showingQuestion = false;
+            visibility = View.GONE;
+        }else{
+            showingQuestion = true;
+            visibility = View.VISIBLE;
+        }
+        findViewById(R.id.Map_questionFrame).setVisibility(visibility);
     }
 
     @Override
