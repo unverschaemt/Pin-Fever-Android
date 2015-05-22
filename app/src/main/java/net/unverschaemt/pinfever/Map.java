@@ -1,23 +1,37 @@
 package net.unverschaemt.pinfever;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.TilesOverlay;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Map extends Activity {
     private Question question = null;
     private boolean showingQuestion = false;
+    MapView mapView;
+    final private int guessMarker = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +39,14 @@ public class Map extends Activity {
         setContentView(R.layout.activity_map);
 
         question = getQuestion();
-        TextView questionTextView = (TextView) findViewById(R.id.Map_questionText);
+        final TextView questionTextView = (TextView) findViewById(R.id.Map_questionText);
         questionTextView.setText(question.getText());
         toggleQuestionVisibility(null);
 
-        MapView mapView = (MapView) findViewById(R.id.mapview);
-        mapView.setBuiltInZoomControls(false);
+        mapView = (MapView) findViewById(R.id.mapview);
+        mapView.setBuiltInZoomControls(true);
         mapView.setMinZoomLevel(2);
+        mapView.setClickable(true);
         mapView.getController().setZoom(2);
         final MapTileProviderBasic tileProvider = new MapTileProviderBasic(getApplicationContext());
         final ITileSource tileSource = new XYTileSource("watercolor", null, 2, 17,
@@ -42,6 +57,34 @@ public class Map extends Activity {
         tilesOverlay.setLoadingBackgroundColor(Color.WHITE);
         mapView.getOverlays().add(tilesOverlay);
 
+        mapView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Projection proj = mapView.getProjection();
+                    GeoPoint point = (GeoPoint) proj.fromPixels((int) event.getX(), (int) event.getY());
+                    setGuessMarker(point);
+                    return true;
+                }
+                return true;
+            }
+        });
+
+    }
+
+    private void setGuessMarker(GeoPoint point) {
+        mapView.getOverlays().clear();
+        addMarker(point);
+    }
+
+    private void addMarker(GeoPoint point){
+        ArrayList<OverlayItem> overlaysItems = new ArrayList<OverlayItem>();
+        overlaysItems.add(new OverlayItem("Marker", "Marker", point));
+        DefaultResourceProxyImpl resourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
+        ItemizedIconOverlay myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlaysItems, null, resourceProxy);
+        List<Overlay> overlays = mapView.getOverlays();
+        overlays.add(myLocationOverlay);
+        this.mapView.invalidate();
     }
 
     private Question getQuestion() {
