@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class NewGame extends Activity implements TokenCompleteTextView.TokenListener{
+public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
 
@@ -32,7 +32,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     private void fillGridLayout() {
         List<User> user = getUser();
-        GridView layout = (GridView)findViewById(R.id.NewGame_gridLayout);
+        GridView layout = (GridView) findViewById(R.id.NewGame_gridLayout);
         layout.setAdapter(new NewGameGridAdapter(this, user, completionView));
 
         adapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, user);
@@ -40,7 +40,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     }
 
-    public UserAutoCompleteView getCompletionView(){
+    public UserAutoCompleteView getCompletionView() {
         return completionView;
     }
 
@@ -89,17 +89,40 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     @Override
     public void onTokenRemoved(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
-        if(completionView.getObjects().size()==0) {
+        if (completionView.getObjects().size() == 0) {
             popup.setVisibility(View.GONE);
         }
     }
 
-    public void start(View view){
+    public void start(View view) {
+        /*** only for testing ***/
+        Game game = new Game();
+        List<Round> rounds = new ArrayList<Round>();
+        Round round = new Round();
+        List<Question> questions = new ArrayList<Question>();
+        Question question = new Question();
+        question.setAnswerLat((long) 52.9384);
+        question.setAnswerLong((long) 07.9384);
+        question.setText("Where is my mom?");
+        questions.add(question);
+        question = new Question();
+        question.setAnswerLat((long) 32.9384);
+        question.setAnswerLong((long) 02.9384);
+        question.setText("Where is your mother fucker?");
+        questions.add(question);
+        round.setQuestions(questions);
+        question = new Question();
+        question.setAnswerLat((long) 42.9384);
+        question.setAnswerLong((long) 11.9384);
+        question.setText("Where is everybody?");
+        questions.add(question);
+        rounds.add(round);
+        game.setRounds(rounds);
+        game.setActiveRound(round);
+        game.setState(GameState.ACTIVE);
+        /*** only for testing ***/
         Intent intent = new Intent(this, Map.class);
-        startActivity(intent);
-    }
-    public void randomGame(View view){
-        Intent intent = new Intent(this, Map.class);
+        intent.putExtra(Map.GAME, game);
         startActivity(intent);
     }
 }
