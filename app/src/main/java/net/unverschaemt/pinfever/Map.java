@@ -23,6 +23,7 @@ import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.util.ArrayList;
@@ -129,16 +130,22 @@ public class Map extends Activity {
     }
 
     private void showGuessesAndAnswer() {
-        for (java.util.Map.Entry<Long, Turninformation> turninfo : question.getTurninformation().entrySet()) {
-            showGuess(turninfo.getValue());
-        }
         GeoPoint answerPoint = new GeoPoint(question.getAnswerLat(), question.getAnswerLong());
         addMarker(answerPoint);
+        for (java.util.Map.Entry<Long, Turninformation> turninfo : question.getTurninformation().entrySet()) {
+            GeoPoint guessPoint = showGuess(turninfo.getValue());
+            PathOverlay myPath = new PathOverlay(Color.RED, this);
+            myPath.addPoint(answerPoint);
+            myPath.addPoint(guessPoint);
+            mapView.getOverlays().add(myPath);
+        }
+        mapView.invalidate();
     }
 
-    private void showGuess(Turninformation turnInformation) {
+    private GeoPoint showGuess(Turninformation turnInformation) {
         GeoPoint answerPoint = new GeoPoint(turnInformation.getAnswerLat(), turnInformation.getAnswerLong());
         addMarker(answerPoint);
+        return answerPoint;
     }
 
     public void submitGuess(View view) {
