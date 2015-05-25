@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class Question implements Serializable{
+public class Question implements Serializable {
     private int ownScore = 0;
     private int opponentScore = 0;
 
@@ -16,16 +16,17 @@ public class Question implements Serializable{
     private float answerLong;
     private int state;
     private long participantWhoWon;
-    private HashMap<Long, Turninformation> turnInformation;
+    private java.util.Map<Long, Turninformation> turnInformation;
 
-    public Question(){
+    public Question() {
 
     }
 
-    public int getOwnScore(){
+    public int getOwnScore() {
         return ownScore;
     }
-    public int getOpponentScore(){
+
+    public int getOpponentScore() {
         return opponentScore;
     }
 
@@ -77,15 +78,15 @@ public class Question implements Serializable{
         this.participantWhoWon = participantWhoWon;
     }
 
-    public void setTurninformation(HashMap<Long, Turninformation> turnInformation){
+    public void setTurninformation(java.util.Map<Long, Turninformation> turnInformation) {
         this.turnInformation = turnInformation;
     }
 
-    public void addTurninformation(Long user, Turninformation turninformation){
+    public void addTurninformation(Long user, Turninformation turninformation) {
         this.turnInformation.put(user, turninformation);
     }
 
-    public java.util.HashMap<Long, Turninformation> getTurninformation() {
+    public java.util.Map<Long, Turninformation> getTurninformation() {
         return turnInformation;
     }
 }

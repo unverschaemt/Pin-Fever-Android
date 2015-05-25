@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -58,11 +59,13 @@ public class Map extends Activity {
 
         resetQuestionText();
         initializeMap();
-        setMapTouchable();
 
         if (gameState == GameState.ACTIVE) {
             setMapTouchable();
         } else {
+            Button submitButton = (Button) findViewById(R.id.Map_submit);
+            submitButton.setText("Next");
+            submitButton.setVisibility(View.VISIBLE);
             showGuessesAndAnswer();
         }
     }
@@ -76,7 +79,11 @@ public class Map extends Activity {
 
     private void resetMap() {
         clearOverlays();
-        findViewById(R.id.Map_submit).setVisibility(View.GONE);
+        if (gameState == GameState.ACTIVE) {
+            findViewById(R.id.Map_submit).setVisibility(View.GONE);
+        } else {
+            showGuessesAndAnswer();
+        }
     }
 
     private void initializeMap() {
@@ -135,8 +142,10 @@ public class Map extends Activity {
     }
 
     public void submitGuess(View view) {
-        GeoPoint guess = this.guess;
-        //TODO: send guess to server
+        if (gameState == GameState.ACTIVE) {
+            GeoPoint guess = this.guess;
+            //TODO: send guess to server
+        }
 
         question = getNextQuestion();
         if (question != null) {
@@ -155,7 +164,9 @@ public class Map extends Activity {
 
     private void clearOverlays() {
         mapView.getOverlays().clear();
-        mapView.getOverlays().add(new TouchableOverlay(this));
+        if (gameState == GameState.ACTIVE) {
+            mapView.getOverlays().add(new TouchableOverlay(this));
+        }
         mapView.invalidate();
     }
 
