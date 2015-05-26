@@ -13,7 +13,6 @@ import android.widget.GridView;
 import com.tokenautocomplete.TokenCompleteTextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -96,64 +95,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     }
 
     public void start(View view) {
-        /*** only for testing ***/
-        Game game = new Game();
-        List<Round> rounds = new ArrayList<Round>();
-        Round round = new Round();
-        List<Question> questions = new ArrayList<Question>();
-        Question question = new Question();
-        java.util.Map<Long, Turninformation> turninformation = new HashMap<Long, Turninformation>();
-        Turninformation info = new Turninformation();
-        info.setAnswerLat((long) 12.7684);
-        info.setAnswerLong((long) 23.7684);
-        turninformation.put((long) 9734802, info);
-        info = new Turninformation();
-        info.setAnswerLat((long) 17.7684);
-        info.setAnswerLong((long) 43.7684);
-        turninformation.put((long) 9734803, info);
-        question.setTurninformation(turninformation);
-        question.setAnswerLat((long) 52.9384);
-        question.setAnswerLong((long) 07.9384);
-        question.setText("Where is my mom?");
-        questions.add(question);
-        question = new Question();
-        turninformation = new HashMap<Long, Turninformation>();
-        info = new Turninformation();
-        info.setAnswerLat((long) 04.7684);
-        info.setAnswerLong((long) 53.7684);
-        turninformation.put((long) 9734802, info);
-        info = new Turninformation();
-        info.setAnswerLat((long) 20.7684);
-        info.setAnswerLong((long) 23.7684);
-        turninformation.put((long) 9734803, info);
-        question.setTurninformation(turninformation);
-        question.setAnswerLat((long) 32.9384);
-        question.setAnswerLong((long) 02.9384);
-        question.setText("Where is your mother fucker?");
-        questions.add(question);
-        round.setQuestions(questions);
-        question = new Question();
-        turninformation = new HashMap<Long, Turninformation>();
-        info = new Turninformation();
-        info.setAnswerLat((long) 08.7684);
-        info.setAnswerLong((long) 33.7684);
-        turninformation.put((long) 9734802, info);
-        info = new Turninformation();
-        info.setAnswerLat((long) 06.7684);
-        info.setAnswerLong((long) 43.7684);
-        turninformation.put((long) 9734803, info);
-        question.setTurninformation(turninformation);
-        question.setAnswerLat((long) 42.9384);
-        question.setAnswerLong((long) 11.9384);
-        question.setText("Where is everybody?");
-        questions.add(question);
-        rounds.add(round);
-        game.setRounds(rounds);
-        game.setActiveRound(round);
-        game.setState(GameState.COMPLETED);
-        /*** only for testing ***/
-        Intent intent = new Intent(this, Map.class);
-        intent.putExtra(Map.GAME, game);
+        Intent intent = new Intent(this, CategoryChooser.class);
         startActivity(intent);
     }
 }
