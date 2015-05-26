@@ -90,6 +90,7 @@ public class Map extends Activity {
     private void initializeMap() {
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
+        mapView.setMultiTouchControls(true);
         mapView.setMinZoomLevel(2);
         mapView.setClickable(true);
         mapView.getController().setZoom(2);
