@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class NewGame extends Activity implements TokenCompleteTextView.TokenListener{
+public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
 
@@ -32,7 +32,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     private void fillGridLayout() {
         List<User> user = getUser();
-        GridView layout = (GridView)findViewById(R.id.NewGame_gridLayout);
+        GridView layout = (GridView) findViewById(R.id.NewGame_gridLayout);
         layout.setAdapter(new NewGameGridAdapter(this, user, completionView));
 
         adapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, user);
@@ -40,14 +40,19 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     }
 
-    public UserAutoCompleteView getCompletionView(){
+    public UserAutoCompleteView getCompletionView() {
         return completionView;
     }
 
     private List<User> getUser() {
+        List<User> user = new ArrayList<User>();
+        User randomUser = new User();
+        randomUser.setUserName(getString(R.string.userName_random));
+        randomUser.setAvatar(R.mipmap.random_user_avatar);
+        user.add(randomUser);
         DataSource dataSource = new DataSource(this);
         dataSource.open();
-        List<User> user = dataSource.getAllFriends();
+        user.addAll(dataSource.getAllFriends());
         dataSource.close();
         return user;
     }
@@ -78,27 +83,19 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     public void onTokenAdded(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
         popup.setVisibility(View.VISIBLE);
-        View randomGame = findViewById(R.id.NewGame_randomGame);
-        randomGame.setVisibility(View.GONE);
 
     }
 
     @Override
     public void onTokenRemoved(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
-        if(completionView.getObjects().size()==0) {
+        if (completionView.getObjects().size() == 0) {
             popup.setVisibility(View.GONE);
-            View randomGame = findViewById(R.id.NewGame_randomGame);
-            randomGame.setVisibility(View.VISIBLE);
         }
     }
 
-    public void start(View view){
-        Intent intent = new Intent(this, Map.class);
-        startActivity(intent);
-    }
-    public void randomGame(View view){
-        Intent intent = new Intent(this, Map.class);
+    public void start(View view) {
+        Intent intent = new Intent(this, CategoryChooser.class);
         startActivity(intent);
     }
 }

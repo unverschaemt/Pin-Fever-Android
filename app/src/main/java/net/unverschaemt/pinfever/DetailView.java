@@ -19,8 +19,8 @@ public class DetailView extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_view);
         Intent intent = getIntent();
-        Game game = (Game)intent.getSerializableExtra(Home.GAME);
-        if(game != null) {
+        Game game = (Game) intent.getSerializableExtra(Home.GAME);
+        if (game != null) {
             fillUI(game);
         }
     }
@@ -29,17 +29,17 @@ public class DetailView extends Activity {
         setScore(game.getOwnScore(), game.getOpponentScore());
         ExpandableListView roundsList = (ExpandableListView) findViewById(R.id.DetailView_rounds);
         roundsList.setAdapter(new RoundListAdapter(this, game.getRounds()));
-        if(game.getState() == 3){
+        if (game.getState() == GameState.ACTIVE) {
             Button revenge = (Button) findViewById(R.id.DetailView_revenge);
-            revenge.setVisibility(View.VISIBLE);
+            revenge.setVisibility(View.GONE);
         }
     }
 
-    private void setScore(int ownScore, int opponentScore){
+    private void setScore(int ownScore, int opponentScore) {
         TextView ownScoreTextView = (TextView) findViewById(R.id.DetailView_ownScore);
-        ownScoreTextView.setText(ownScore+"");
+        ownScoreTextView.setText(ownScore + "");
         TextView opponentScoreTextView = (TextView) findViewById(R.id.DetailView_opponentScore);
-        opponentScoreTextView.setText(opponentScore+"");
+        opponentScoreTextView.setText(opponentScore + "");
     }
 
     @Override

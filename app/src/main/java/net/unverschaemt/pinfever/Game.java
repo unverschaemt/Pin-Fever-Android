@@ -10,9 +10,10 @@ import java.util.List;
 public class Game implements Serializable {
     private long id;
     private List<Round> rounds;
-    private int state;
-    private long activeRound = -1;
+    private GameState state;
+    private Round activeRound;
     private List<Participant> participants;
+    private long activeRoundID;
 
     public Game() {
 
@@ -50,19 +51,19 @@ public class Game implements Serializable {
         return opponentScore;
     }
 
-    public long getActiveRound() {
+    public Round getActiveRound() {
         return activeRound;
     }
 
-    public void setActiveRound(long activeRound) {
+    public void setActiveRound(Round activeRound) {
         this.activeRound = activeRound;
     }
 
-    public int getState() {
+    public GameState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(GameState state) {
         this.state = state;
     }
 
@@ -72,5 +73,13 @@ public class Game implements Serializable {
 
     public void setParticipants(List<Participant> participants) {
         this.participants = participants;
+    }
+
+    public void setActiveRoundID(long id) {
+        this.activeRoundID = id;
+    }
+
+    public long getActiveRoundID() {
+        return this.activeRoundID;
     }
 }

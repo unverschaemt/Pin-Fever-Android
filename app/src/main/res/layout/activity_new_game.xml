@@ -16,16 +16,6 @@
         android:layout_alignParentRight="false"
         android:layout_alignParentEnd="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/random"
-        android:id="@+id/NewGame_randomGame"
-        android:layout_above="@+id/NewGame_gridLayout"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="false"
-        android:onClick="randomGame" />
-
     <GridView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

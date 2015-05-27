@@ -1,18 +1,21 @@
 package net.unverschaemt.pinfever;
 
+import java.io.Serializable;
+
 /**
  * Created by kkoile on 12.05.15.
  */
-public class Turninformation {
+public class Turninformation implements Serializable {
 
     private long id;
     private float answerLat;
     private float answerLong;
     private float distance;
 
-    public Turninformation(){
+    public Turninformation() {
 
     }
+
     public long getId() {
         return id;
     }

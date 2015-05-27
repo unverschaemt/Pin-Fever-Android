@@ -129,8 +129,8 @@ public class DataSource {
     public Game updateGame(Game game) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.getId());
-        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState());
-        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound());
+        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
+        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
         database.update(MySQLiteHelper.TABLE_GAMES, values, MySQLiteHelper.GAMES_COLUMN_ID + " = " + game.getId(), null);
         List<Round> rounds = new ArrayList<Round>();
         if (game.getRounds() != null) {
@@ -187,6 +187,13 @@ public class DataSource {
         while (!cursor.isAfterLast()) {
             Game game = cursorToGame(cursor);
             game.setRounds(getAllRoundsForGameId(game.getId()));
+            if (game.getActiveRoundID() > -1) {
+                for (Round round : game.getRounds()) {
+                    if (round.getId() == game.getActiveRoundID()) {
+                        game.setActiveRound(round);
+                    }
+                }
+            }
             game.setParticipants(getAllParticipantsForGameId(game.getId()));
             games.add(game);
             cursor.moveToNext();
@@ -327,8 +334,8 @@ public class DataSource {
     private Game cursorToGame(Cursor cursor) {
         Game game = new Game();
         game.setID(cursor.getLong(0));
-        game.setState(cursor.getInt(1));
-        game.setActiveRound(cursor.getLong(2));
+        game.setState(GameState.values()[cursor.getInt(1)]);
+        game.setActiveRoundID(cursor.getLong(2));
         return game;
     }
 

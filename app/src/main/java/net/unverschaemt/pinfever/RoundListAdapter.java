@@ -13,15 +13,15 @@ import java.util.List;
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class RoundListAdapter extends BaseExpandableListAdapter{
+public class RoundListAdapter extends BaseExpandableListAdapter {
     private Context context;
-    private static LayoutInflater inflater=null;
+    private static LayoutInflater inflater = null;
     private List<Round> rounds;
 
     public RoundListAdapter(Context context, List<Round> rounds) {
         this.rounds = rounds;
-        this.context=context;
-        inflater = ( LayoutInflater )context.
+        this.context = context;
+        inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -77,15 +77,15 @@ public class RoundListAdapter extends BaseExpandableListAdapter{
 
         int roundNumber = groupPosition;
         tvRoundNumber.setText(convertView.getResources().getString(R.string.round) + " " + roundNumber);
-        tvOwnScore.setText(rounds.get(groupPosition).getOwnScore()+"");
-        tvOpponentScore.setText(rounds.get(groupPosition).getOpponentScore()+"");
+        tvOwnScore.setText(rounds.get(groupPosition).getOwnScore() + "");
+        tvOpponentScore.setText(rounds.get(groupPosition).getOpponentScore() + "");
 
         return convertView;
     }
 
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final Question question = (Question)getChild(groupPosition, childPosition);
+        final Question question = (Question) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.context
@@ -102,13 +102,13 @@ public class RoundListAdapter extends BaseExpandableListAdapter{
 
         int questionNumber = childPosition + 1;
         tvQuestionNumber.setText(convertView.getResources().getString(R.string.question) + " " + questionNumber);
-        tvOwnScore.setText(question.getOwnScore()+"");
-        tvOpponentScore.setText(question.getOpponentScore()+"");
+        tvOwnScore.setText(question.getOwnScore() + "");
+        tvOpponentScore.setText(question.getOpponentScore() + "");
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), Map.class);
-                intent.putExtra(DetailView.QUESTION, rounds.get(groupPosition).getQuestions().get(childPosition));
+                intent.putExtra(Map.QUESTION, rounds.get(groupPosition).getQuestions().get(childPosition));
                 v.getContext().startActivity(intent);
             }
         });
