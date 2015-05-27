@@ -2,13 +2,14 @@ package net.unverschaemt.pinfever;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-public class Login extends Activity{
+public class Login extends Activity {
     public final static String USERNAME = "net.unverschaemt.PinFever.USERNAME";
 
     @Override
@@ -16,6 +17,19 @@ public class Login extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if (isClientSignedIn()) {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+        }
+    }
+
+    private boolean isClientSignedIn() {
+        SharedPreferences sharedPreferences = getSharedPreferences(serverAPI.token, MODE_PRIVATE);
+        String token = sharedPreferences.getString(serverAPI.token, "");
+        if (token.equals("")) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -40,17 +54,18 @@ public class Login extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
-    public void login(View view){
+    public void login(View view) {
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
     }
-    public void register(View view){
+
+    public void register(View view) {
         Intent intent = new Intent(this, Register.class);
-        EditText userNameTextField = (EditText)findViewById(R.id.Login_userName);
+        EditText userNameTextField = (EditText) findViewById(R.id.Login_userName);
         String userName = userNameTextField.getText().toString();
-        if(!userName.equals("")){
-              intent.putExtra(USERNAME, userName);
-          }
+        if (!userName.equals("")) {
+            intent.putExtra(USERNAME, userName);
+        }
         startActivity(intent);
     }
 
