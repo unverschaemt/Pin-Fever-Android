@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,17 +13,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class Register extends Activity {
-    private EditText tvName;
     private EditText tvEmail;
     private EditText tvPassword1;
     private EditText tvPassword2;
@@ -37,7 +30,6 @@ public class Register extends Activity {
         setContentView(R.layout.activity_register);
         Intent intent = getIntent();
         tvDisplayName = (EditText) findViewById(R.id.Register_displayName);
-        tvName = (EditText) findViewById(R.id.Register_name);
         tvEmail = (EditText) findViewById(R.id.Register_email);
         tvPassword1 = (EditText) findViewById(R.id.Register_password1);
         tvPassword2 = (EditText) findViewById(R.id.Register_password2);
@@ -75,7 +67,6 @@ public class Register extends Activity {
 
     public void register(View view) {
         String displayName = tvDisplayName.getText().toString();
-        String name = tvName.getText().toString();
         String email = tvEmail.getText().toString();
         String password1 = tvPassword1.getText().toString();
         String password2 = tvPassword2.getText().toString();
@@ -92,13 +83,13 @@ public class Register extends Activity {
         protected String doInBackground(String... params) {
             JSONObject jsonParam = new JSONObject();
             try {
-                jsonParam.put("email", params[0]);
-                jsonParam.put("password", params[1]);
-                jsonParam.put("displayName", params[2]);
+                jsonParam.put(serverAPI.paramEmail, params[0]);
+                jsonParam.put(serverAPI.paramPassword, params[1]);
+                jsonParam.put(serverAPI.paramDisplayName, params[2]);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return serverAPI.connect("/auth/register", jsonParam);
+            return serverAPI.connect(serverAPI.urlRegister, jsonParam);
         }
 
         // onPostExecute displays the results of the AsyncTask.

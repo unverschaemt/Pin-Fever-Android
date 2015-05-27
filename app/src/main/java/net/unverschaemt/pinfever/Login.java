@@ -13,13 +13,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Login extends Activity {
     public final static String USERNAME = "net.unverschaemt.PinFever.USERNAME";
@@ -85,12 +80,12 @@ public class Login extends Activity {
         protected String doInBackground(String... params) {
             JSONObject jsonParam = new JSONObject();
             try {
-                jsonParam.put("email", params[0]);
-                jsonParam.put("password", params[1]);
+                jsonParam.put(serverAPI.paramEmail, params[0]);
+                jsonParam.put(serverAPI.paramPassword, params[1]);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return serverAPI.connect("/auth/login", jsonParam);
+            return serverAPI.connect(serverAPI.urlLogin, jsonParam);
         }
 
         // onPostExecute displays the results of the AsyncTask.

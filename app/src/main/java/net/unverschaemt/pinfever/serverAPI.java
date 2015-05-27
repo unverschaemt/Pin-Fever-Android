@@ -1,31 +1,19 @@
 package net.unverschaemt.pinfever;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.StrictMode;
-import android.provider.*;
-import android.provider.Settings;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,10 +21,18 @@ import java.util.List;
  */
 public class serverAPI {
     public final static String serverURL = "http://87.106.19.69:8080";
+
     public final static String errorObject = "err";
     public final static String errorInfo = "info";
     public final static String data = "data";
     public final static String token = "token";
+
+    public final static String paramEmail = "email";
+    public final static String paramPassword = "password";
+    public final static String paramDisplayName = "displayName";
+
+    public final static String urlLogin = "/auth/login";
+    public final static String urlRegister = "/auth/register";
 
     public static String connect(String urlString, JSONObject jsonParam) {
 
