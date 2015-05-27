@@ -47,4 +47,5 @@
     <string name="title_activity_category_chooser">CategoryChooser</string>
     <string name="required">Required</string>
     <string name="passwordsDontMatch">Passwords don\'t Match</string>
+    <string name="signOut">Sign Out</string>
 </resources>

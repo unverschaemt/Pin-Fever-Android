@@ -25,11 +25,7 @@ public class Login extends Activity {
 
     private boolean isClientSignedIn() {
         SharedPreferences sharedPreferences = getSharedPreferences(serverAPI.token, MODE_PRIVATE);
-        String token = sharedPreferences.getString(serverAPI.token, "");
-        if (token.equals("")) {
-            return false;
-        }
-        return true;
+        return sharedPreferences.contains(serverAPI.token);
     }
 
     @Override

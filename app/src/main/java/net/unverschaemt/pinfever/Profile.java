@@ -2,6 +2,7 @@ package net.unverschaemt.pinfever;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -21,6 +22,14 @@ public class Profile extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+    }
+
+    public void signOut(View view) {
+        SharedPreferences sharedPreferences = getSharedPreferences(serverAPI.token, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(serverAPI.token);
+        editor.commit();
+        startActivity(new Intent(this, Login.class));
     }
 
     @Override
@@ -45,7 +54,7 @@ public class Profile extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void changeAvatar(View view){
+    public void changeAvatar(View view) {
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
@@ -55,14 +64,14 @@ public class Profile extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        switch(requestCode) {
+        switch (requestCode) {
             case SELECT_PHOTO:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     try {
                         final Uri imageUri = imageReturnedIntent.getData();
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        CircularImageButton imageButton = (CircularImageButton)findViewById(R.id.Profile_avatar);
+                        CircularImageButton imageButton = (CircularImageButton) findViewById(R.id.Profile_avatar);
                         imageButton.setImageBitmap(selectedImage);
                         //TODO: updateProfile on server
                     } catch (FileNotFoundException e) {
