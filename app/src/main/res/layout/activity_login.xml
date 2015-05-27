@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
-                android:id="@+id/Login_userName"
+                android:id="@+id/Login_email"
                 android:hint="@string/placeholder_Username"
                 android:layout_alignWithParentIfMissing="false"
                 android:layout_alignParentLeft="true"
@@ -46,7 +46,7 @@
                 android:ems="10"
                 android:id="@+id/Login_password"
                 android:hint="@string/placeholder_Password"
-                android:layout_below="@+id/Login_userName"
+                android:layout_below="@+id/Login_email"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
 
@@ -85,5 +85,15 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="true" />
-        </RelativeLayout>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Login_progressBar"
+            android:layout_above="@+id/Login_password"
+            android:layout_centerHorizontal="true"
+            android:indeterminate="false"
+            android:visibility="gone" />
+    </RelativeLayout>
 </RelativeLayout>

@@ -25,14 +25,14 @@ public class serverAPI {
     public final static String data = "data";
     public final static String token = "token";
 
-    public static JSONObject connect(String urlString) {
+    public static String connect(String urlString) {
 
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         urlString = serverURL + urlString;
-        JSONObject response = null;
+        String response = null;
         try {
             URL url = new URL(urlString);
             HttpURLConnection con = (HttpURLConnection) url
@@ -48,20 +48,16 @@ public class serverAPI {
         return response;
     }
 
-    private static JSONObject readStream(InputStream in) {
+    private static String readStream(InputStream in) {
         BufferedReader reader = null;
-        JSONObject json = null;
+        String jsonString = "";
         try {
             reader = new BufferedReader(new InputStreamReader(in));
-            String jsonString = "";
             String line = "";
             while ((line = reader.readLine()) != null) {
                 jsonString += line;
             }
-            json = new JSONObject(jsonString);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         } finally {
             if (reader != null) {
@@ -72,6 +68,6 @@ public class serverAPI {
                 }
             }
         }
-        return json;
+        return jsonString;
     }
 }

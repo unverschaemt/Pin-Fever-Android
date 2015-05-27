@@ -94,5 +94,15 @@
             android:layout_alignParentBottom="true"
             android:onClick="register" />
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Register_progressBar"
+            android:layout_above="@+id/Register_email"
+            android:layout_centerHorizontal="true"
+            android:indeterminate="false"
+            android:visibility="gone" />
+
     </RelativeLayout>
 </RelativeLayout>

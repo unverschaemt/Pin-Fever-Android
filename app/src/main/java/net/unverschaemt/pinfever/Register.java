@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -17,11 +19,12 @@ import org.json.JSONObject;
 
 
 public class Register extends Activity {
-    EditText tvDisplayName;
-    EditText tvName;
-    EditText tvEmail;
-    EditText tvPassword1;
-    EditText tvPassword2;
+    private EditText tvName;
+    private EditText tvEmail;
+    private EditText tvPassword1;
+    private EditText tvPassword2;
+    private EditText tvDisplayName;
+    private ProgressBar busyIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +39,7 @@ public class Register extends Activity {
         String userName = intent.getStringExtra(Login.USERNAME);
         tvDisplayName.setText(userName);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.
-                ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        busyIndicator = (ProgressBar) findViewById(R.id.Register_progressBar);
     }
 
     @Override
@@ -75,11 +76,32 @@ public class Register extends Activity {
         String password2 = tvPassword2.getText().toString();
 
         if (entriesAreValid(displayName, email, password1, password2)) {
-            JSONObject result = serverAPI.connect("/auth/register?email=" + email + "&password=" + password1 + "&displayName=" + displayName);
+            busyIndicator.setVisibility(View.VISIBLE);
+            new ServerConnectTask().execute(email, password1, displayName);
+        }
+    }
+
+    private class ServerConnectTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            return serverAPI.connect("/auth/register?email=" + params[0] + "&password=" + params[1] + "&displayName=" + params[2]);
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String resultString) {
+            busyIndicator.setVisibility(View.GONE);
+            JSONObject result = null;
+            try {
+                result = new JSONObject(resultString);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (result.isNull(serverAPI.errorObject)) {
                 String token = getTokenFromRequest(result);
                 storeToken(token);
-                startActivity(new Intent(this, Home.class));
+                startActivity(new Intent(getBaseContext(), Home.class));
             } else {
                 showErrorMessage(result);
             }
