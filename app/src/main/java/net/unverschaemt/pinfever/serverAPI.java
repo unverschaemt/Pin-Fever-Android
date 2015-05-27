@@ -3,6 +3,7 @@ package net.unverschaemt.pinfever;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.StrictMode;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +26,11 @@ public class serverAPI {
     public final static String token = "token";
 
     public static JSONObject connect(String urlString) {
+
+        StrictMode.ThreadPolicy policy = new StrictMode.
+                ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         urlString = serverURL + urlString;
         JSONObject response = null;
         try {
@@ -32,7 +38,7 @@ public class serverAPI {
             HttpURLConnection con = (HttpURLConnection) url
                     .openConnection();
             if (con.getResponseCode() == con.HTTP_BAD_REQUEST) {
-                response = new JSONObject("{'err':'Bad Request!', 'info':'Email already registered!'}");
+                response = readStream(con.getErrorStream());
             } else {
                 response = readStream(con.getInputStream());
             }
