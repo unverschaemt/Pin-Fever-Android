@@ -14,8 +14,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Register extends Activity {
@@ -85,7 +90,15 @@ public class Register extends Activity {
 
         @Override
         protected String doInBackground(String... params) {
-            return serverAPI.connect("/auth/register?email=" + params[0] + "&password=" + params[1] + "&displayName=" + params[2]);
+            JSONObject jsonParam = new JSONObject();
+            try {
+                jsonParam.put("email", params[0]);
+                jsonParam.put("password", params[1]);
+                jsonParam.put("displayName", params[2]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return serverAPI.connect("/auth/register", jsonParam);
         }
 
         // onPostExecute displays the results of the AsyncTask.
