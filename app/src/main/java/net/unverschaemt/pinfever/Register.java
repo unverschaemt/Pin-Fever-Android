@@ -98,7 +98,7 @@ public class Register extends Activity {
                         storeToken(token);
                         startActivity(new Intent(getBaseContext(), Home.class));
                     } else {
-                        showErrorMessage(result);
+                        ErrorHandler.showErrorMessage(result, getBaseContext());
                     }
                 }
             });
@@ -147,16 +147,6 @@ public class Register extends Activity {
 
     private void makeError(EditText editText, String errorMessage) {
         editText.setError(errorMessage);
-    }
-
-    private void showErrorMessage(JSONObject result) {
-        String errorMessage = "";
-        try {
-            errorMessage = result.getString(ServerAPI.errorInfo);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     private String getTokenFromRequest(JSONObject result) {

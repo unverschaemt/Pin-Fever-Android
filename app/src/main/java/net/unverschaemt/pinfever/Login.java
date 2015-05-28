@@ -36,8 +36,16 @@ public class Login extends Activity {
         tvEmail = (EditText) findViewById(R.id.Login_email);
         tvPassword = (EditText) findViewById(R.id.Login_password);
         busyIndicator = (ProgressBar) findViewById(R.id.Login_progressBar);
-
         serverAPI = new ServerAPI(this);
+        
+        notifyUserIfSessionHasExpired();
+    }
+
+    private void notifyUserIfSessionHasExpired() {
+        Intent intent = getIntent();
+        if (intent.hasExtra(ErrorHandler.errorUnauthorized)) {
+            Toast.makeText(this, getString(R.string.sessionExpired), Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean isClientSignedIn() {
@@ -92,7 +100,7 @@ public class Login extends Activity {
                             storeToken(token);
                             startActivity(new Intent(getBaseContext(), Home.class));
                         } else {
-                            showErrorMessage(result);
+                            ErrorHandler.showErrorMessage(result, getBaseContext());
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -109,16 +117,6 @@ public class Login extends Activity {
             editor.putString(ServerAPI.token, token);
             editor.commit();
         }
-    }
-
-    private void showErrorMessage(JSONObject result) {
-        String errorMessage = "";
-        try {
-            errorMessage = result.getString(ServerAPI.errorInfo);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     private String getTokenFromRequest(JSONObject result) {

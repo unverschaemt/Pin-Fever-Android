@@ -48,4 +48,6 @@
     <string name="required">Required</string>
     <string name="passwordsDontMatch">Passwords don\'t Match</string>
     <string name="signOut">Sign Out</string>
+    <string name="sessionExpired">Session expired! Please sign in again!</string>
+    <string name="message_UserNotFound">User not found!</string>
 </resources>

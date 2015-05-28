@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,7 +66,7 @@ public class FriendsList extends Activity {
                         }
                         updateFriendsList(friends);
                     } else {
-                        showErrorMessage(result);
+                        ErrorHandler.showErrorMessage(result, getBaseContext());
                     }
                 } catch (JSONException e) {
                     busyIndicator.setVisibility(View.GONE);
@@ -159,11 +158,12 @@ public class FriendsList extends Activity {
                             updateFriendsList(player);
                         } else {
                             JSONObject userNotFoundObject = new JSONObject();
-                            userNotFoundObject.put(ServerAPI.errorInfo, "No user found!");
-                            showErrorMessage(userNotFoundObject);
+                            userNotFoundObject.put(ServerAPI.errorInfo, getString(R.string.message_UserNotFound));
+                            userNotFoundObject.put(ServerAPI.errorObject, "");
+                            ErrorHandler.showErrorMessage(userNotFoundObject, getBaseContext());
                         }
                     } else {
-                        showErrorMessage(result);
+                        ErrorHandler.showErrorMessage(result, getBaseContext());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -187,7 +187,7 @@ public class FriendsList extends Activity {
                 try {
                     result = new JSONObject(resultString);
                     if (!result.isNull(serverAPI.errorObject)) {
-                        showErrorMessage(result);
+                        ErrorHandler.showErrorMessage(result, getBaseContext());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -203,16 +203,6 @@ public class FriendsList extends Activity {
         player.setScore(playerJSON.getInt(ServerAPI.level));
         player.setAvatar(R.mipmap.dummy_avatar);//TODO get real avatar
         return player;
-    }
-
-    private void showErrorMessage(JSONObject result) {
-        String errorMessage = "";
-        try {
-            errorMessage = result.getString(serverAPI.errorInfo);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     public void fillFriendsList(List<User> friends) {
