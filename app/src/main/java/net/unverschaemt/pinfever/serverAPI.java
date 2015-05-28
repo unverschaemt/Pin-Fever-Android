@@ -1,114 +1,68 @@
 package net.unverschaemt.pinfever;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 
-import org.apache.http.NameValuePair;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Created by D060338 on 26.05.2015.
  */
-public class serverAPI {
+public class ServerAPI {
     public final static String serverURL = "http://87.106.19.69:8080";
 
     public final static String errorObject = "err";
     public final static String errorInfo = "info";
-    public final static String data = "data";
+    public final static String dataObject = "data";
+    public final static String playerObject = "player";
+    public final static String friends = "friends";
+    public final static String players = "players";
+    public final static String id = "_id";
+    public final static String displayName = "displayName";
+    public final static String level = "level";
+    public final static String avatar = "avatar";
     public final static String token = "token";
 
+    public final static String paramAuthToken = "api-auth-token";
     public final static String paramEmail = "email";
     public final static String paramPassword = "password";
     public final static String paramDisplayName = "displayName";
+    public final static String paramPlayerId = "playerId";
 
     public final static String urlLogin = "/auth/login";
     public final static String urlRegister = "/auth/register";
+    public final static String urlAddFriend = "/players/me/addfriend/";
+    public final static String urlFriendsList = "/players/me/friends";
+    public final static String urlPlayersSearch = "/players/search/";
+    public final static String urlGetPlayer = "/players/";
 
-    public static String connect(String urlString, JSONObject jsonParam) {
+    private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
+    private final Context context;
+
+    public ServerAPI(Context context) {
+        this.context = context;
+        requestMethods.put(urlLogin, RequestMethod.POST);
+        requestMethods.put(urlRegister, RequestMethod.POST);
+        requestMethods.put(urlAddFriend, RequestMethod.POST);
+        requestMethods.put(urlFriendsList, RequestMethod.GET);
+        requestMethods.put(urlPlayersSearch, RequestMethod.GET);
+        requestMethods.put(urlGetPlayer, RequestMethod.GET);
 
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
-        urlString = serverURL + urlString;
-        String response = "";
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection con = (HttpURLConnection) url
-                    .openConnection();
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Host", urlString);
-            con.connect();
-
-            DataOutputStream printout = new DataOutputStream(con.getOutputStream());
-            printout.writeBytes(jsonParam.toString());
-            printout.flush();
-            printout.close();
-
-            int code = con.getResponseCode();
-            if (con.getResponseCode() == con.HTTP_OK) {
-                response = readStream(con.getInputStream());
-            } else {
-                response = readStream(con.getErrorStream());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
     }
 
-    private static String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for (NameValuePair pair : params) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
-        }
-
-        return result.toString();
+    public void connect(String urlRequest, String urlParameters, JSONObject jsonParam, Connector connector) {
+        connector.execute(serverURL + urlRequest + urlParameters, jsonParam, requestMethods.get(urlRequest), getToken());
     }
 
-    private static String readStream(InputStream in) {
-        BufferedReader reader = null;
-        String jsonString = "";
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                jsonString += line;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return jsonString;
+    public String getToken() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(ServerAPI.token, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(ServerAPI.token, "");
     }
+
 }

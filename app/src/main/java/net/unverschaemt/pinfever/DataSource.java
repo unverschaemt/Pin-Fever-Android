@@ -48,15 +48,15 @@ public class DataSource {
         dbHelper.close();
     }
 
-    public User createFriend(long id, String username, int score, int avatar) {
+    public User createFriend(User friend) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, id);
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, username);
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, score);
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, avatar);
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatar());
         database.insert(MySQLiteHelper.TABLE_FRIENDS, null, values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_FRIENDS,
-                allColumnsFriends, MySQLiteHelper.FRIENDS_COLUMN_ID + " = " + id, null,
+                allColumnsFriends, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null,
                 null, null, null);
         cursor.moveToFirst();
         User newUser = cursorToFriend(cursor);
@@ -65,10 +65,10 @@ public class DataSource {
     }
 
     public void deleteFriend(User user) {
-        long id = user.getId();
+        String id = user.getId();
         System.out.println("Friend deleted with id: " + id);
         database.delete(MySQLiteHelper.TABLE_FRIENDS, MySQLiteHelper.FRIENDS_COLUMN_ID
-                + " = " + id, null);
+                + " = \"" + id + "\"", null);
     }
 
     public List<User> getAllFriends() {
@@ -90,7 +90,7 @@ public class DataSource {
 
     private User cursorToFriend(Cursor cursor) {
         User friend = new User();
-        friend.setId(cursor.getLong(0));
+        friend.setId(cursor.getString(0));
         friend.setUserName(cursor.getString(1));
         friend.setScore(cursor.getInt(2));
         friend.setAvatar(cursor.getInt(3));
@@ -265,8 +265,8 @@ public class DataSource {
 
     private Participant cursorToParticipant(Cursor cursor) {
         Participant participant = new Participant();
-        participant.setId(cursor.getLong(0));
-        participant.setPlayer(cursor.getLong(1));
+        participant.setId(cursor.getString(0));
+        participant.setPlayer(cursor.getString(1));
         participant.setState(cursor.getInt(3));
         participant.setScore(cursor.getInt(4));
         return participant;
@@ -464,5 +464,26 @@ public class DataSource {
         round.setId(cursor.getLong(0));
         round.setCategory(cursor.getString(1));
         return round;
+    }
+
+    public void updateFriends(List<User> newFriends) {
+        List<User> oldFriends = getAllFriends();
+        for (User friend : newFriends) {
+            updateFriend(friend);
+
+        }
+        oldFriends.removeAll(newFriends);
+        for (User friend : oldFriends) {
+            deleteFriend(friend);
+        }
+    }
+
+    private void updateFriend(User friend) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatar());
+        database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = " + friend.getId(), null);
     }
 } 

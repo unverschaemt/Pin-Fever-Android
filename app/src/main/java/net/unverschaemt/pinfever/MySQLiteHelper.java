@@ -11,18 +11,18 @@ import android.util.Log;
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_FRIENDS = "friends";
-    public static final String FRIENDS_COLUMN_ID = "id";
+    public static final String FRIENDS_COLUMN_ID = "_id";
     public static final String FRIENDS_COLUMN_USERNAME = "username";
     public static final String FRIENDS_COLUMN_SCORE = "score";
     public static final String FRIENDS_COLUMN_AVATAR = "avatar";
 
     public static final String TABLE_GAMES = "games";
-    public static final String GAMES_COLUMN_ID = "id";
+    public static final String GAMES_COLUMN_ID = "_id";
     public static final String GAMES_COLUMN_STATE = "state";
     public static final String GAMES_COLUMN_ACTIVE_ROUND = "activeRound";
 
     public static final String TABLE_QUESTIONS = "questions";
-    public static final String QUESTIONS_COLUMN_ID = "id";
+    public static final String QUESTIONS_COLUMN_ID = "_id";
     public static final String QUESTIONS_COLUMN_TEXT = "text";
     public static final String QUESTIONS_COLUMN_ROUND = "round";
     public static final String QUESTIONS_COLUMN_ANSWER_LAT = "answerLat";
@@ -31,12 +31,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE = "participantWhoWon";
 
     public static final String TABLE_ROUNDS = "rounds";
-    public static final String ROUNDS_COLUMN_ID = "id";
+    public static final String ROUNDS_COLUMN_ID = "_id";
     public static final String ROUNDS_COLUMN_CATEGORY = "category";
     public static final String ROUNDS_COLUMN_GAME = "game";
 
     public static final String TABLE_TURNINFORMATION = "turninformation";
-    public static final String TURNINFORMATION_COLUMN_ID = "id";
+    public static final String TURNINFORMATION_COLUMN_ID = "_id";
     public static final String TURNINFORMATION_COLUMN_QUESTION = "question";
     public static final String TURNINFORMATION_COLUMN_PARTICIPANT = "participant";
     public static final String TURNINFORMATION_COLUMN_LAT = "lat";
@@ -44,7 +44,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String TURNINFORMATION_COLUMN_DISTANCE = "distance";
 
     public static final String TABLE_PARTICIPANTS = "participants";
-    public static final String PARTICIPANTS_COLUMN_ID = "id";
+    public static final String PARTICIPANTS_COLUMN_ID = "_id";
     public static final String PARTICIPANTS_COLUMN_PLAYER = "player";
     public static final String PARTICIPANTS_COLUMN_GAME = "game";
     public static final String PARTICIPANTS_COLUMN_STATE = "status";
@@ -53,21 +53,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "pinfever.db";
     //TODO: change to version 1
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 8;
 
     // Database creation sql statement
 
-    private static final String CREATE_FRIENDS_DATABASE =  "create table "
+    private static final String CREATE_FRIENDS_DATABASE = "create table "
             + TABLE_FRIENDS + "(" + FRIENDS_COLUMN_ID
-            + " long primary key, " + FRIENDS_COLUMN_USERNAME
+            + " text, " + FRIENDS_COLUMN_USERNAME
             + " text, " + FRIENDS_COLUMN_SCORE + " integer, " + FRIENDS_COLUMN_AVATAR + " integer );";
 
-    private static final String CREATE_GAMES_DATABASE =  "create table "
+    private static final String CREATE_GAMES_DATABASE = "create table "
             + TABLE_GAMES + "(" + GAMES_COLUMN_ID
             + " long primary key, " + GAMES_COLUMN_STATE
             + " integer, " + GAMES_COLUMN_ACTIVE_ROUND + " long );";
 
-    private static final String CREATE_QUESTIONS_DATABASE =  "create table " + TABLE_QUESTIONS + "("
+    private static final String CREATE_QUESTIONS_DATABASE = "create table " + TABLE_QUESTIONS + "("
             + QUESTIONS_COLUMN_ID + " long primary key, "
             + QUESTIONS_COLUMN_TEXT + " text, "
             + QUESTIONS_COLUMN_ROUND + " long, "
@@ -76,12 +76,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + QUESTIONS_COLUMN_STATE + " integer, "
             + QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE + " long );";
 
-    private static final String CREATE_ROUNDS_DATABASE =  "create table " + TABLE_ROUNDS + "("
+    private static final String CREATE_ROUNDS_DATABASE = "create table " + TABLE_ROUNDS + "("
             + ROUNDS_COLUMN_ID + " long primary key, "
             + ROUNDS_COLUMN_CATEGORY + " text, "
             + ROUNDS_COLUMN_GAME + " long );";
 
-    private static final String CREATE_TURNINFORMATION_DATABASE =  "create table " + TABLE_TURNINFORMATION + "("
+    private static final String CREATE_TURNINFORMATION_DATABASE = "create table " + TABLE_TURNINFORMATION + "("
             + TURNINFORMATION_COLUMN_ID + " long primary key, "
             + TURNINFORMATION_COLUMN_QUESTION + " long, "
             + TURNINFORMATION_COLUMN_PARTICIPANT + " long, "
@@ -89,9 +89,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + TURNINFORMATION_COLUMN_LONG + " float, "
             + TURNINFORMATION_COLUMN_DISTANCE + " float );";
 
-    private static final String CREATE_PARTICIPANTS_DATABASE =  "create table " + TABLE_PARTICIPANTS + "("
-            + PARTICIPANTS_COLUMN_ID + " long primary key, "
-            + PARTICIPANTS_COLUMN_PLAYER + " long, "
+    private static final String CREATE_PARTICIPANTS_DATABASE = "create table " + TABLE_PARTICIPANTS + "("
+            + PARTICIPANTS_COLUMN_ID + " text primary key, "
+            + PARTICIPANTS_COLUMN_PLAYER + " text, "
             + PARTICIPANTS_COLUMN_GAME + " long, "
             + PARTICIPANTS_COLUMN_STATE + " int, "
             + PARTICIPANTS_COLUMN_SCORE + " int );";
@@ -114,7 +114,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(MySQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
-                        + newVersion + ", which will destroy all old data");
+                        + newVersion + ", which will destroy all old dataObject");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIENDS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAMES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);

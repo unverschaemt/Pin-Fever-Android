@@ -24,9 +24,9 @@ public class Profile extends Activity {
     }
 
     public void signOut(View view) {
-        SharedPreferences sharedPreferences = getSharedPreferences(serverAPI.token, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(ServerAPI.token, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(serverAPI.token);
+        editor.remove(ServerAPI.token);
         editor.commit();
         startActivity(new Intent(this, Login.class));
     }

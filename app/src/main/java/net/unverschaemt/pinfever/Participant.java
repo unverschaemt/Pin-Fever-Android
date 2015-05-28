@@ -7,8 +7,8 @@ import android.provider.Telephony;
  */
 public class Participant {
 
-    private long id;
-    private long player;
+    private String id;
+    private String player;
     private int state;
     private int score;
 
@@ -16,19 +16,19 @@ public class Participant {
 
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public long getPlayer() {
+    public String getPlayer() {
         return player;
     }
 
-    public void setPlayer(long player) {
+    public void setPlayer(String player) {
         this.player = player;
     }
 

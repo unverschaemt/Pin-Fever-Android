@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +23,8 @@ public class Register extends Activity {
     private EditText tvDisplayName;
     private ProgressBar busyIndicator;
 
+    private ServerAPI serverAPI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +38,7 @@ public class Register extends Activity {
         tvDisplayName.setText(userName);
 
         busyIndicator = (ProgressBar) findViewById(R.id.Register_progressBar);
+        serverAPI = new ServerAPI(this);
     }
 
     @Override
@@ -73,50 +75,41 @@ public class Register extends Activity {
 
         if (entriesAreValid(displayName, email, password1, password2)) {
             busyIndicator.setVisibility(View.VISIBLE);
-            new ServerConnectTask().execute(email, password1, displayName);
-        }
-    }
-
-    private class ServerConnectTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
             JSONObject jsonParam = new JSONObject();
             try {
-                jsonParam.put(serverAPI.paramEmail, params[0]);
-                jsonParam.put(serverAPI.paramPassword, params[1]);
-                jsonParam.put(serverAPI.paramDisplayName, params[2]);
+                jsonParam.put(ServerAPI.paramEmail, email);
+                jsonParam.put(ServerAPI.paramPassword, password1);
+                jsonParam.put(ServerAPI.paramDisplayName, displayName);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return serverAPI.connect(serverAPI.urlRegister, jsonParam);
-        }
-
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String resultString) {
-            busyIndicator.setVisibility(View.GONE);
-            JSONObject result = null;
-            try {
-                result = new JSONObject(resultString);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (result.isNull(serverAPI.errorObject)) {
-                String token = getTokenFromRequest(result);
-                storeToken(token);
-                startActivity(new Intent(getBaseContext(), Home.class));
-            } else {
-                showErrorMessage(result);
-            }
+            serverAPI.connect(ServerAPI.urlRegister, "", jsonParam, new Connector() {
+                @Override
+                protected void onPostExecute(String resultString) {
+                    busyIndicator.setVisibility(View.GONE);
+                    JSONObject result = null;
+                    try {
+                        result = new JSONObject(resultString);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (result.isNull(ServerAPI.errorObject)) {
+                        String token = getTokenFromRequest(result);
+                        storeToken(token);
+                        startActivity(new Intent(getBaseContext(), Home.class));
+                    } else {
+                        showErrorMessage(result);
+                    }
+                }
+            });
         }
     }
 
     private void storeToken(String token) {
         if (!token.equals("")) {
-            SharedPreferences sharedpreferences = getSharedPreferences(serverAPI.token, Context.MODE_PRIVATE);
+            SharedPreferences sharedpreferences = getSharedPreferences(ServerAPI.token, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString(serverAPI.token, token);
+            editor.putString(ServerAPI.token, token);
             editor.commit();
         }
     }
@@ -159,7 +152,7 @@ public class Register extends Activity {
     private void showErrorMessage(JSONObject result) {
         String errorMessage = "";
         try {
-            errorMessage = result.getString(serverAPI.errorInfo);
+            errorMessage = result.getString(ServerAPI.errorInfo);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -170,8 +163,8 @@ public class Register extends Activity {
         String token = "";
         JSONObject data = null;
         try {
-            data = result.getJSONObject(serverAPI.data);
-            token = data.getString(serverAPI.token);
+            data = result.getJSONObject(ServerAPI.dataObject);
+            token = data.getString(ServerAPI.token);
         } catch (JSONException e) {
             e.printStackTrace();
         }

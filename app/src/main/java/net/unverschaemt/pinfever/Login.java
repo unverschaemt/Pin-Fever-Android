@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +22,8 @@ public class Login extends Activity {
     private EditText tvPassword = null;
     private ProgressBar busyIndicator = null;
 
+    private ServerAPI serverAPI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,11 +36,13 @@ public class Login extends Activity {
         tvEmail = (EditText) findViewById(R.id.Login_email);
         tvPassword = (EditText) findViewById(R.id.Login_password);
         busyIndicator = (ProgressBar) findViewById(R.id.Login_progressBar);
+
+        serverAPI = new ServerAPI(this);
     }
 
     private boolean isClientSignedIn() {
-        SharedPreferences sharedPreferences = getSharedPreferences(serverAPI.token, MODE_PRIVATE);
-        return sharedPreferences.contains(serverAPI.token);
+        SharedPreferences sharedPreferences = getSharedPreferences(ServerAPI.token, MODE_PRIVATE);
+        return sharedPreferences.contains(ServerAPI.token);
     }
 
     @Override
@@ -70,49 +73,40 @@ public class Login extends Activity {
 
         if (entriesAreValid(email, password)) {
             busyIndicator.setVisibility(View.VISIBLE);
-            new ServerConnectTask().execute(email, password);
-        }
-    }
-
-    private class ServerConnectTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
             JSONObject jsonParam = new JSONObject();
             try {
-                jsonParam.put(serverAPI.paramEmail, params[0]);
-                jsonParam.put(serverAPI.paramPassword, params[1]);
+                jsonParam.put(ServerAPI.paramEmail, email);
+                jsonParam.put(ServerAPI.paramPassword, password);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return serverAPI.connect(serverAPI.urlLogin, jsonParam);
-        }
-
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String resultString) {
-            busyIndicator.setVisibility(View.GONE);
-            JSONObject result = null;
-            try {
-                result = new JSONObject(resultString);
-                if (result.isNull(serverAPI.errorObject)) {
-                    String token = getTokenFromRequest(result);
-                    storeToken(token);
-                    startActivity(new Intent(getBaseContext(), Home.class));
-                } else {
-                    showErrorMessage(result);
+            serverAPI.connect(ServerAPI.urlLogin, "", jsonParam, new Connector() {
+                @Override
+                protected void onPostExecute(String resultString) {
+                    busyIndicator.setVisibility(View.GONE);
+                    JSONObject result = null;
+                    try {
+                        result = new JSONObject(resultString);
+                        if (result.isNull(ServerAPI.errorObject)) {
+                            String token = getTokenFromRequest(result);
+                            storeToken(token);
+                            startActivity(new Intent(getBaseContext(), Home.class));
+                        } else {
+                            showErrorMessage(result);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            });
         }
     }
 
     private void storeToken(String token) {
         if (!token.equals("")) {
-            SharedPreferences sharedpreferences = getSharedPreferences(serverAPI.token, Context.MODE_PRIVATE);
+            SharedPreferences sharedpreferences = getSharedPreferences(ServerAPI.token, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString(serverAPI.token, token);
+            editor.putString(ServerAPI.token, token);
             editor.commit();
         }
     }
@@ -120,7 +114,7 @@ public class Login extends Activity {
     private void showErrorMessage(JSONObject result) {
         String errorMessage = "";
         try {
-            errorMessage = result.getString(serverAPI.errorInfo);
+            errorMessage = result.getString(ServerAPI.errorInfo);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -131,8 +125,8 @@ public class Login extends Activity {
         String token = "";
         JSONObject data = null;
         try {
-            data = result.getJSONObject(serverAPI.data);
-            token = data.getString(serverAPI.token);
+            data = result.getJSONObject(ServerAPI.dataObject);
+            token = data.getString(ServerAPI.token);
         } catch (JSONException e) {
             e.printStackTrace();
         }
