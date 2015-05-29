@@ -114,7 +114,7 @@ public class Home extends Activity {
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     JsonObject player = data.getAsJsonObject(ServerAPI.playerObject);
-                    final User ownUser = ServerAPI.convertJSONToUser(player);
+                    ownUser = ServerAPI.convertJSONToUser(player);
                     ContextWrapper cw = new ContextWrapper(getBaseContext());
                     File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
                     serverAPI.downloadFile(ServerAPI.urlGetPlayer, ServerAPI.urlGetPlayerMe + "/img.jpeg", new File(directory, ownUser.getId() + ".jpeg"), new FutureCallback() {

@@ -2,6 +2,8 @@ package net.unverschaemt.pinfever;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +47,9 @@ public class FriendsList extends Activity {
         dataSource.open();
         List<User> friends = dataSource.getAllFriends();
         dataSource.close();
+        for (User friend : friends) {
+            friend.setAvatar(AvatarHandler.loadAvatarFromStorage(this, friend.getId()));
+        }
         updateFriendsFromServer();
         return friends;
     }
@@ -55,12 +61,22 @@ public class FriendsList extends Activity {
             public void onCompleted(Exception e, Object result) {
                 busyIndicator.setVisibility(View.GONE);
                 JsonObject jsonObject = (JsonObject) result;
-                List<User> friends = new ArrayList<User>();
+                final List<User> friends = new ArrayList<User>();
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     JsonArray friendsJSON = data.getAsJsonArray(ServerAPI.friends);
-                    for (JsonElement friend : friendsJSON) {
-                        friends.add(ServerAPI.convertJSONToUser(friend.getAsJsonObject()));
+                    for (final JsonElement friend : friendsJSON) {
+                        final User newFriend = ServerAPI.convertJSONToUser(friend.getAsJsonObject());
+                        ContextWrapper cw = new ContextWrapper(getBaseContext());
+                        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+                        serverAPI.downloadFile(ServerAPI.urlGetPlayer, newFriend.getId() + "/img.jpeg", new File(directory, newFriend.getId() + ".jpeg"), new FutureCallback() {
+                            @Override
+                            public void onCompleted(Exception e, Object result) {
+                                newFriend.setAvatar(AvatarHandler.loadAvatarFromStorage(getBaseContext(), newFriend.getId()));
+                                fillFriendsList(friends);
+                            }
+                        });
+                        friends.add(newFriend);
                     }
                     updateFriendsList(friends);
                 } else {
