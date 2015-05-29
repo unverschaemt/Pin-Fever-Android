@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -39,27 +41,77 @@ public class ServerAPI {
     public final static String urlFriendsList = "/players/me/friends";
     public final static String urlPlayersSearch = "/players/search/";
     public final static String urlGetPlayer = "/players/";
+    public final static String urlUploadAvatar = "/players/me/avatarupload";
     public final static String urlGetPlayerMe = "me";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
+    private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
     private final Context context;
 
     public ServerAPI(Context context) {
         this.context = context;
         requestMethods.put(urlLogin, RequestMethod.POST);
+        contentTypes.put(urlLogin, ContentType.JSON);
         requestMethods.put(urlRegister, RequestMethod.POST);
+        contentTypes.put(urlRegister, ContentType.JSON);
         requestMethods.put(urlAddFriend, RequestMethod.POST);
+        contentTypes.put(urlAddFriend, ContentType.JSON);
         requestMethods.put(urlFriendsList, RequestMethod.GET);
         requestMethods.put(urlPlayersSearch, RequestMethod.GET);
         requestMethods.put(urlGetPlayer, RequestMethod.GET);
+        requestMethods.put(urlUploadAvatar, RequestMethod.POST);
+        contentTypes.put(urlUploadAvatar, ContentType.FORM_DATA);
+
 
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
 
-    public void connect(String urlRequest, String urlParameters, JSONObject jsonParam, Connector connector) {
-        connector.execute(serverURL + urlRequest + urlParameters, jsonParam, requestMethods.get(urlRequest), getToken());
+    public void connect(String urlRequest, String urlParameters, Object postObject, FutureCallback callback) {
+        RequestMethod requestMethod = requestMethods.get(urlRequest);
+        switch (requestMethod) {
+            case GET:
+                makeGETRequest(urlRequest, urlParameters, callback);
+                break;
+            case POST:
+                makePostRequest(urlRequest, urlParameters, postObject, callback);
+                break;
+        }
+    }
+
+    private void makeGETRequest(String urlRequest, String urlParameters, FutureCallback callback) {
+        Ion.with(context)
+                .load(ServerAPI.serverURL + urlRequest + urlParameters)
+                .addHeader(ServerAPI.paramAuthToken, getToken())
+                .asJsonObject()
+                .setCallback(callback);
+        return;
+    }
+
+    private void makePostRequest(String urlRequest, String urlParameters, Object postObject, FutureCallback callback) {
+        ContentType contentType = contentTypes.get(urlRequest);
+        switch (contentType) {
+            case JSON:
+                JsonObject jsonObject = (JsonObject) postObject;
+                Ion.with(context)
+                        .load(ServerAPI.serverURL + urlRequest + urlParameters)
+                        .addHeader(ServerAPI.paramAuthToken, getToken())
+                        .setJsonObjectBody(jsonObject)
+                        .asJsonObject()
+                        .setCallback(callback);
+                break;
+            case FORM_DATA:
+                File file = (File) postObject;
+                Ion.with(context)
+                        .load(ServerAPI.serverURL + urlRequest + urlParameters)
+                        .addHeader(ServerAPI.paramAuthToken, getToken())
+                        .setMultipartFile("image", "image/jpeg", file)
+                        .setMultipartContentType("multipart/form-data")
+                        .asJsonObject()
+                        .setCallback(callback);
+                break;
+        }
     }
 
     public String getToken() {
@@ -67,11 +119,11 @@ public class ServerAPI {
         return sharedPreferences.getString(ServerAPI.token, "");
     }
 
-    public static User convertJSONToUser(JSONObject playerJSON) throws JSONException {
+    public static User convertJSONToUser(JsonObject playerJSON) {
         User player = new User();
-        player.setId(playerJSON.getString(ServerAPI.id));
-        player.setUserName(playerJSON.getString(ServerAPI.displayName));
-        player.setScore(playerJSON.getInt(ServerAPI.level));
+        player.setId(playerJSON.get(ServerAPI.id).getAsString());
+        player.setUserName(playerJSON.get(ServerAPI.displayName).getAsString());
+        player.setScore(playerJSON.get(ServerAPI.level).getAsInt());
         player.setAvatar(R.mipmap.dummy_avatar + "");//TODO get real avatar
         return player;
     }

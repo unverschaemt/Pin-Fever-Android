@@ -5,8 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 /**
  * Created by D060338 on 28.05.2015.
@@ -14,22 +13,18 @@ import org.json.JSONObject;
 public class ErrorHandler {
     public static String errorUnauthorized = "Unauthorized!";
 
-    public static void showErrorMessage(JSONObject result, Context context) {
+    public static void showErrorMessage(JsonObject result, Context context) {
         String errorInfo = "";
         String errorMessage = "";
-        try {
-            errorInfo = result.getString(ServerAPI.errorInfo);
-            errorMessage = result.getString(ServerAPI.errorObject);
-            if (errorMessage.equals(errorUnauthorized)) {
-                removeToken(context);
-                Intent intent = new Intent(context, Login.class);
-                intent.putExtra(errorUnauthorized, true);
-                context.startActivity(intent);
-            } else {
-                Toast.makeText(context, errorInfo, Toast.LENGTH_LONG).show();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        errorInfo = result.get(ServerAPI.errorInfo).getAsString();
+        errorMessage = result.get(ServerAPI.errorObject).getAsString();
+        if (errorMessage.equals(errorUnauthorized)) {
+            removeToken(context);
+            Intent intent = new Intent(context, Login.class);
+            intent.putExtra(errorUnauthorized, true);
+            context.startActivity(intent);
+        } else {
+            Toast.makeText(context, errorInfo, Toast.LENGTH_LONG).show();
         }
     }
 

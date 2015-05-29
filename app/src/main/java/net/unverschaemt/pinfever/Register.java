@@ -12,8 +12,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 
 
 public class Register extends Activity {
@@ -75,33 +75,26 @@ public class Register extends Activity {
 
         if (entriesAreValid(displayName, email, password1, password2)) {
             busyIndicator.setVisibility(View.VISIBLE);
-            JSONObject jsonParam = new JSONObject();
-            try {
-                jsonParam.put(ServerAPI.paramEmail, email);
-                jsonParam.put(ServerAPI.paramPassword, password1);
-                jsonParam.put(ServerAPI.paramDisplayName, displayName);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            serverAPI.connect(ServerAPI.urlRegister, "", jsonParam, new Connector() {
-                @Override
-                protected void onPostExecute(String resultString) {
-                    busyIndicator.setVisibility(View.GONE);
-                    JSONObject result = null;
-                    try {
-                        result = new JSONObject(resultString);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            JsonObject jsonParam = new JsonObject();
+            jsonParam.addProperty(ServerAPI.paramEmail, email);
+            jsonParam.addProperty(ServerAPI.paramPassword, password1);
+            jsonParam.addProperty(ServerAPI.paramDisplayName, displayName);
+            serverAPI.connect(ServerAPI.urlRegister, "", jsonParam, new FutureCallback() {
+                        @Override
+                        public void onCompleted(Exception e, Object result) {
+                            busyIndicator.setVisibility(View.GONE);
+                            JsonObject jsonObject = (JsonObject) result;
+                            if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                                String token = getTokenFromRequest(jsonObject);
+                                storeToken(token);
+                                startActivity(new Intent(getBaseContext(), Home.class));
+                            } else {
+                                ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                            }
+                        }
                     }
-                    if (result.isNull(ServerAPI.errorObject)) {
-                        String token = getTokenFromRequest(result);
-                        storeToken(token);
-                        startActivity(new Intent(getBaseContext(), Home.class));
-                    } else {
-                        ErrorHandler.showErrorMessage(result, getBaseContext());
-                    }
-                }
-            });
+
+            );
         }
     }
 
@@ -149,15 +142,11 @@ public class Register extends Activity {
         editText.setError(errorMessage);
     }
 
-    private String getTokenFromRequest(JSONObject result) {
+    private String getTokenFromRequest(JsonObject result) {
         String token = "";
-        JSONObject data = null;
-        try {
-            data = result.getJSONObject(ServerAPI.dataObject);
-            token = data.getString(ServerAPI.token);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JsonObject data = result.getAsJsonObject(ServerAPI.dataObject);
+        data = result.getAsJsonObject(ServerAPI.dataObject);
+        token = data.get(ServerAPI.token).getAsString();
         return token;
     }
 }

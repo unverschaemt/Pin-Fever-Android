@@ -11,8 +11,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 
 import java.util.List;
 
@@ -94,24 +94,19 @@ public class Home extends Activity {
 
     private void updateProfile() {
         busyIndicator.setVisibility(View.VISIBLE);
-        serverAPI.connect(ServerAPI.urlGetPlayer, ServerAPI.urlGetPlayerMe, null, new Connector() {
+        serverAPI.connect(ServerAPI.urlGetPlayer, ServerAPI.urlGetPlayerMe, null, new FutureCallback() {
             @Override
-            protected void onPostExecute(String resultString) {
+            public void onCompleted(Exception e, Object result) {
                 busyIndicator.setVisibility(View.GONE);
-                try {
-
-                    JSONObject result = new JSONObject(resultString);
-                    if (result.isNull(serverAPI.errorObject)) {
-                        JSONObject data = result.getJSONObject(ServerAPI.dataObject);
-                        JSONObject player = data.getJSONObject(ServerAPI.playerObject);
-                        User ownUser = ServerAPI.convertJSONToUser(player);
-                        saveOwnUserInDatabase(ownUser);
-                        showDataFromOwnUser(ownUser);
-                    } else {
-                        ErrorHandler.showErrorMessage(result, getBaseContext());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+                    JsonObject player = data.getAsJsonObject(ServerAPI.playerObject);
+                    User ownUser = ServerAPI.convertJSONToUser(player);
+                    saveOwnUserInDatabase(ownUser);
+                    showDataFromOwnUser(ownUser);
+                } else {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                 }
             }
         });

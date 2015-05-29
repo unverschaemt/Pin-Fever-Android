@@ -4,26 +4,38 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 public class Profile extends Activity {
     private final int SELECT_PHOTO = 1;
 
     private DataSource dataSource;
+    private ServerAPI serverAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         dataSource = new DataSource(this);
+        serverAPI = new ServerAPI(this);
     }
 
     public void signOut(View view) {
@@ -96,43 +108,93 @@ public class Profile extends Activity {
                     CircularImageButton imageButton = (CircularImageButton) findViewById(R.id.Profile_avatar);
                     Bitmap bitmap = null;
                     try {
-                        bitmap = decodeUri(imageUri);
+                        bitmap = AvatarHandler.decodeUri(this, imageUri);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
                     imageButton.setImageBitmap(bitmap);
-                    //TODO: updateProfile on server
+                    updateAvatar(bitmap);
                 }
         }
     }
 
-    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
+    private void updateAvatar(Bitmap bitmap) {
+        saveAvatarOnDevice(bitmap);
+        updateAvatarOnServer(bitmap);
+    }
 
-        // Decode image size
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+    private void updateAvatarOnServer(Bitmap bitmap) {
+        File f = convertBitmapToJPEGAndGetFile(bitmap);
+        Ion.with(this)
+                .load(ServerAPI.serverURL + ServerAPI.urlUploadAvatar)
+                .addHeader(ServerAPI.token, new ServerAPI(this).getToken())
+                .setMultipartFile("bild.jpeg", "image/jpeg", f)
+                .setMultipartContentType("multipart/form-data")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        JsonObject jsonObject = (JsonObject) result;
+                        if (!jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                            ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                        }
+                    }
+                });
+    }
 
-        // The new size we want to scale to
-        final int REQUIRED_SIZE = 140;
-
-        // Find the correct scale value. It should be the power of 2.
-        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-        int scale = 1;
-        while (true) {
-            if (width_tmp / 2 < REQUIRED_SIZE
-                    || height_tmp / 2 < REQUIRED_SIZE) {
-                break;
+    private String readStream(InputStream in) {
+        BufferedReader reader = null;
+        String jsonString = "";
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                jsonString += line;
             }
-            width_tmp /= 2;
-            height_tmp /= 2;
-            scale *= 2;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return jsonString;
+    }
+
+    private File convertBitmapToJPEGAndGetFile(Bitmap bitmap) {
+        //create a file to write bitmap data
+        File f = new File(this.getCacheDir(), "newAvatar.jpeg");
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        // Decode with inSampleSize
-        BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
+//Convert bitmap to byte array
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
+        byte[] bitmapdata = bos.toByteArray();
 
+//write the bytes in file
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(f);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return f;
+    }
+
+    private void saveAvatarOnDevice(Bitmap bitmap) {
+        //TODO: save avatar on device
     }
 }

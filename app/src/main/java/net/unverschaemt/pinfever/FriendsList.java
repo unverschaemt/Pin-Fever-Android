@@ -11,9 +11,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,28 +50,21 @@ public class FriendsList extends Activity {
 
     private void updateFriendsFromServer() {
         busyIndicator.setVisibility(View.VISIBLE);
-        serverAPI.connect(ServerAPI.urlFriendsList, "", null, new Connector() {
+        serverAPI.connect(ServerAPI.urlFriendsList, "", null, new FutureCallback() {
             @Override
-            protected void onPostExecute(String resultString) {
+            public void onCompleted(Exception e, Object result) {
                 busyIndicator.setVisibility(View.GONE);
-                JSONObject result = null;
-                try {
-                    List<User> friends = new ArrayList<User>();
-                    result = new JSONObject(resultString);
-                    if (result.isNull(serverAPI.errorObject)) {
-                        JSONObject data = result.getJSONObject(ServerAPI.dataObject);
-                        JSONArray friendsJSON = data.getJSONArray(ServerAPI.friends);
-                        for (int i = 0; i < friendsJSON.length(); i++) {
-                            JSONObject friendJSON = friendsJSON.getJSONObject(i);
-                            friends.add(ServerAPI.convertJSONToUser(friendJSON));
-                        }
-                        updateFriendsList(friends);
-                    } else {
-                        ErrorHandler.showErrorMessage(result, getBaseContext());
+                JsonObject jsonObject = (JsonObject) result;
+                List<User> friends = new ArrayList<User>();
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+                    JsonArray friendsJSON = data.getAsJsonArray(ServerAPI.friends);
+                    for (JsonElement friend : friendsJSON) {
+                        friends.add(ServerAPI.convertJSONToUser(friend.getAsJsonObject()));
                     }
-                } catch (JSONException e) {
-                    busyIndicator.setVisibility(View.GONE);
-                    e.printStackTrace();
+                    updateFriendsList(friends);
+                } else {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                 }
             }
         });
@@ -141,56 +135,42 @@ public class FriendsList extends Activity {
 
     private void searchForFriendAndAddIfFriendExists(String friendName) {
         busyIndicator.setVisibility(View.VISIBLE);
-        serverAPI.connect(serverAPI.urlPlayersSearch, friendName, null, new Connector() {
+        serverAPI.connect(serverAPI.urlPlayersSearch, friendName, null, new FutureCallback() {
             @Override
-            protected void onPostExecute(String resultString) {
-                JSONObject result = null;
-                try {
-                    busyIndicator.setVisibility(View.GONE);
-                    result = new JSONObject(resultString);
-                    if (result.isNull(serverAPI.errorObject)) {
-                        JSONObject data = result.getJSONObject(ServerAPI.dataObject);
-                        JSONArray players = data.getJSONArray(ServerAPI.players);
-                        if (players.length() > 0) {
-                            JSONObject playerJSON = (JSONObject) players.get(0);
-                            addFriend(playerJSON.getString(ServerAPI.id));
-                            User player = ServerAPI.convertJSONToUser(playerJSON);
-                            updateFriendsList(player);
-                        } else {
-                            JSONObject userNotFoundObject = new JSONObject();
-                            userNotFoundObject.put(ServerAPI.errorInfo, getString(R.string.message_UserNotFound));
-                            userNotFoundObject.put(ServerAPI.errorObject, "");
-                            ErrorHandler.showErrorMessage(userNotFoundObject, getBaseContext());
-                        }
+            public void onCompleted(Exception e, Object result) {
+                busyIndicator.setVisibility(View.GONE);
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+                    JsonArray players = data.getAsJsonArray(ServerAPI.players);
+                    if (players.size() > 0) {
+                        JsonObject playerJSON = players.get(0).getAsJsonObject();
+                        addFriend(playerJSON.get(ServerAPI.id).getAsString());
+                        User player = ServerAPI.convertJSONToUser(playerJSON);
+                        updateFriendsList(player);
                     } else {
-                        ErrorHandler.showErrorMessage(result, getBaseContext());
+                        JsonObject userNotFoundObject = new JsonObject();
+                        userNotFoundObject.addProperty(ServerAPI.errorInfo, getString(R.string.message_UserNotFound));
+                        userNotFoundObject.addProperty(ServerAPI.errorObject, "");
+                        ErrorHandler.showErrorMessage(userNotFoundObject, getBaseContext());
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                } else {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                 }
             }
         });
     }
 
     private void addFriend(final String friendId) {
-        JSONObject jsonParam = new JSONObject();
-        try {
-            jsonParam.put(ServerAPI.paramPlayerId, friendId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        serverAPI.connect(serverAPI.urlAddFriend, friendId, jsonParam, new Connector() {
+        JsonObject jsonParam = new JsonObject();
+        jsonParam.addProperty(ServerAPI.paramPlayerId, friendId);
+        serverAPI.connect(serverAPI.urlAddFriend, friendId, jsonParam, new FutureCallback() {
             @Override
-            protected void onPostExecute(String resultString) {
-                JSONObject result = null;
+            public void onCompleted(Exception e, Object result) {
                 busyIndicator.setVisibility(View.GONE);
-                try {
-                    result = new JSONObject(resultString);
-                    if (!result.isNull(serverAPI.errorObject)) {
-                        ErrorHandler.showErrorMessage(result, getBaseContext());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                JsonObject jsonObject = (JsonObject) result;
+                if (!jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                 }
             }
         });

@@ -12,8 +12,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 
 public class Login extends Activity {
     public final static String USERNAME = "net.unverschaemt.PinFever.USERNAME";
@@ -37,7 +37,7 @@ public class Login extends Activity {
         tvPassword = (EditText) findViewById(R.id.Login_password);
         busyIndicator = (ProgressBar) findViewById(R.id.Login_progressBar);
         serverAPI = new ServerAPI(this);
-        
+
         notifyUserIfSessionHasExpired();
     }
 
@@ -81,29 +81,20 @@ public class Login extends Activity {
 
         if (entriesAreValid(email, password)) {
             busyIndicator.setVisibility(View.VISIBLE);
-            JSONObject jsonParam = new JSONObject();
-            try {
-                jsonParam.put(ServerAPI.paramEmail, email);
-                jsonParam.put(ServerAPI.paramPassword, password);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            serverAPI.connect(ServerAPI.urlLogin, "", jsonParam, new Connector() {
+            final JsonObject jsonParam = new JsonObject();
+            jsonParam.addProperty(ServerAPI.paramEmail, email);
+            jsonParam.addProperty(ServerAPI.paramPassword, password);
+            serverAPI.connect(ServerAPI.urlLogin, "", jsonParam, new FutureCallback() {
                 @Override
-                protected void onPostExecute(String resultString) {
+                public void onCompleted(Exception e, Object result) {
                     busyIndicator.setVisibility(View.GONE);
-                    JSONObject result = null;
-                    try {
-                        result = new JSONObject(resultString);
-                        if (result.isNull(ServerAPI.errorObject)) {
-                            String token = getTokenFromRequest(result);
-                            storeToken(token);
-                            startActivity(new Intent(getBaseContext(), Home.class));
-                        } else {
-                            ErrorHandler.showErrorMessage(result, getBaseContext());
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    JsonObject jsonObject = (JsonObject) result;
+                    if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                        String token = getTokenFromRequest(jsonObject);
+                        storeToken(token);
+                        startActivity(new Intent(getBaseContext(), Home.class));
+                    } else {
+                        ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                     }
                 }
             });
@@ -119,15 +110,10 @@ public class Login extends Activity {
         }
     }
 
-    private String getTokenFromRequest(JSONObject result) {
+    private String getTokenFromRequest(JsonObject jsonObject) {
         String token = "";
-        JSONObject data = null;
-        try {
-            data = result.getJSONObject(ServerAPI.dataObject);
-            token = data.getString(ServerAPI.token);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+        token = data.get(ServerAPI.token).getAsString();
         return token;
     }
 

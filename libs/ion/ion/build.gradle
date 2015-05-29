@@ -1,0 +1,63 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    compile 'com.android.support:palette-v7:+'
+    compile 'com.android.support:support-v4:+'
+    compile project(':AndroidAsync:AndroidAsync')
+    compile 'com.google.code.gson:gson:2.3'
+
+    // for when i wanna test this against gms conscrypt
+    androidTestCompile 'com.google.android.gms:play-services:+'
+    // mockito nom nom oh god im drunk
+    androidTestCompile "org.mockito:mockito-core:1.+"
+    androidTestCompile "com.google.dexmaker:dexmaker:1.2"
+    androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
+}
+
+android {
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+
+            java {
+                srcDir 'src/'
+            }
+        }
+        androidTest.java.srcDirs=['test/src/']
+        androidTest.res.srcDirs=['test/res/']
+        androidTest.assets.srcDirs=['test/assets/']
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    defaultConfig {
+        targetSdkVersion 22
+        minSdkVersion 9
+    }
+
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
+}
+
+// upload to maven task
+if (System.getenv().I_AM_KOUSH == 'true') {
+    apply from: 'https://raw.githubusercontent.com/koush/mvn-repo/master/maven.gradle'
+
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    pom*.whenConfigured { pom ->
+                        pom.dependencies.removeAll { dep -> dep.artifactId == 'support-v4' }
+                        pom.dependencies.removeAll { dep -> dep.artifactId == 'palette-v7' }
+                    }
+                }
+            }
+        }
+    }
+}
