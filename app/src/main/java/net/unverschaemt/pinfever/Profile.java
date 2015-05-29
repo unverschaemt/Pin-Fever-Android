@@ -17,18 +17,44 @@ import java.io.FileNotFoundException;
 public class Profile extends Activity {
     private final int SELECT_PHOTO = 1;
 
+    private DataSource dataSource;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        dataSource = new DataSource(this);
     }
 
     public void signOut(View view) {
+        tidyUp();
+        startActivity(new Intent(this, Login.class));
+    }
+
+    private void tidyUp() {
+        deleteToken();
+        deleteOwnUser();
+        dropTables();
+    }
+
+    private void dropTables() {
+        dataSource.open();
+        dataSource.dropAllTables();
+        dataSource.close();
+    }
+
+    private void deleteOwnUser() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Home.OWNUSER, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    private void deleteToken() {
         SharedPreferences sharedPreferences = getSharedPreferences(ServerAPI.token, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(ServerAPI.token);
         editor.commit();
-        startActivity(new Intent(this, Login.class));
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class ServerAPI {
     public final static String urlFriendsList = "/players/me/friends";
     public final static String urlPlayersSearch = "/players/search/";
     public final static String urlGetPlayer = "/players/";
+    public final static String urlGetPlayerMe = "me";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private final Context context;
@@ -64,5 +66,15 @@ public class ServerAPI {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ServerAPI.token, Context.MODE_PRIVATE);
         return sharedPreferences.getString(ServerAPI.token, "");
     }
+
+    public static User convertJSONToUser(JSONObject playerJSON) throws JSONException {
+        User player = new User();
+        player.setId(playerJSON.getString(ServerAPI.id));
+        player.setUserName(playerJSON.getString(ServerAPI.displayName));
+        player.setScore(playerJSON.getInt(ServerAPI.level));
+        player.setAvatar(R.mipmap.dummy_avatar + "");//TODO get real avatar
+        return player;
+    }
+
 
 }

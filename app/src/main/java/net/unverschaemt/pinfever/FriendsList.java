@@ -62,7 +62,7 @@ public class FriendsList extends Activity {
                         JSONArray friendsJSON = data.getJSONArray(ServerAPI.friends);
                         for (int i = 0; i < friendsJSON.length(); i++) {
                             JSONObject friendJSON = friendsJSON.getJSONObject(i);
-                            friends.add(convertJSONToUser(friendJSON));
+                            friends.add(ServerAPI.convertJSONToUser(friendJSON));
                         }
                         updateFriendsList(friends);
                     } else {
@@ -154,7 +154,7 @@ public class FriendsList extends Activity {
                         if (players.length() > 0) {
                             JSONObject playerJSON = (JSONObject) players.get(0);
                             addFriend(playerJSON.getString(ServerAPI.id));
-                            User player = convertJSONToUser(playerJSON);
+                            User player = ServerAPI.convertJSONToUser(playerJSON);
                             updateFriendsList(player);
                         } else {
                             JSONObject userNotFoundObject = new JSONObject();
@@ -194,15 +194,6 @@ public class FriendsList extends Activity {
                 }
             }
         });
-    }
-
-    private User convertJSONToUser(JSONObject playerJSON) throws JSONException {
-        User player = new User();
-        player.setId(playerJSON.getString(ServerAPI.id));
-        player.setUserName(playerJSON.getString(ServerAPI.displayName));
-        player.setScore(playerJSON.getInt(ServerAPI.level));
-        player.setAvatar(R.mipmap.dummy_avatar);//TODO get real avatar
-        return player;
     }
 
     public void fillFriendsList(List<User> friends) {

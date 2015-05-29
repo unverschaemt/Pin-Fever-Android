@@ -5,16 +5,16 @@ import java.io.Serializable;
 /**
  * Created by D060338 on 05.05.2015.
  */
-public class User implements Serializable{
+public class User implements Serializable {
 
     String userName;
     String id;
     String name;
     String email;
     int score;
-    int avatar;
+    String avatar;
 
-    public User(){
+    public User() {
 
     }
 
@@ -51,24 +51,24 @@ public class User implements Serializable{
         this.email = email;
     }
 
-    public int getScore(){
+    public int getScore() {
         return score;
     }
 
-    public void setScore(int score){
+    public void setScore(int score) {
         this.score = score;
     }
 
-    public int getAvatar() {
+    public String getAvatarURL() {
         return avatar;
     }
 
-    public void setAvatar(int avatar) {
+    public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return userName;
     }
 }

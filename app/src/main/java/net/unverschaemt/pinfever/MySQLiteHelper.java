@@ -60,7 +60,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String CREATE_FRIENDS_DATABASE = "create table "
             + TABLE_FRIENDS + "(" + FRIENDS_COLUMN_ID
             + " text, " + FRIENDS_COLUMN_USERNAME
-            + " text, " + FRIENDS_COLUMN_SCORE + " integer, " + FRIENDS_COLUMN_AVATAR + " integer );";
+            + " text, " + FRIENDS_COLUMN_SCORE + " integer, " + FRIENDS_COLUMN_AVATAR + " text );";
 
     private static final String CREATE_GAMES_DATABASE = "create table "
             + TABLE_GAMES + "(" + GAMES_COLUMN_ID
@@ -115,6 +115,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         Log.w(MySQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old dataObject");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIENDS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAMES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROUNDS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TURNINFORMATION);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PARTICIPANTS);
+        onCreate(db);
+    }
+
+    public void dropTables(SQLiteDatabase db) {
+        Log.w(MySQLiteHelper.class.getName(),
+                "Dropped All Tables");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIENDS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GAMES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);

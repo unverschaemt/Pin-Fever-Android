@@ -2,7 +2,6 @@ package net.unverschaemt.pinfever;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Telephony;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +63,7 @@ public class GameListAdapter extends BaseAdapter {
         holder.tvUserName.setText(userFromParticipant.getUserName());
         holder.tvOwnScore.setText(games.get(position).getOwnScore() + "");
         holder.tvOpponentScore.setText(games.get(position).getOpponentScore() + "");
-        holder.imgAvatar.setImageResource(userFromParticipant.getAvatar());
+        holder.imgAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(userFromParticipant.getAvatarURL()));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

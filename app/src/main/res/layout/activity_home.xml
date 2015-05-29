@@ -44,7 +44,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="210"
         android:id="@+id/Home_score"
         android:layout_below="@+id/Home_avatar"
         android:layout_centerHorizontal="true"
@@ -78,5 +77,15 @@
         android:id="@+id/Home_activeGames"
         android:smoothScrollbar="false"
         android:layout_below="@+id/Home_textView_activeGames" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Home_progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:indeterminate="false"
+        android:visibility="gone" />
 
 </RelativeLayout>

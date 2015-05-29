@@ -1,12 +1,10 @@
 package net.unverschaemt.pinfever;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -20,13 +18,13 @@ public class NewGameGridAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final UserAutoCompleteView completionView;
 
-    public NewGameGridAdapter(Context context, List<User> user, UserAutoCompleteView completionView){
+    public NewGameGridAdapter(Context context, List<User> user, UserAutoCompleteView completionView) {
         this.user = user;
-        inflater = (LayoutInflater)context.
+        inflater = (LayoutInflater) context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.completionView = completionView;
     }
-    
+
     @Override
     public int getCount() {
         return user.size();
@@ -42,21 +40,20 @@ public class NewGameGridAdapter extends BaseAdapter {
         return position;
     }
 
-    public class Holder
-    {
+    public class Holder {
         CircularImageButton cibAvatar;
         TextView tvDisplayName;
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Holder holder=new Holder();
+        Holder holder = new Holder();
         View rowView;
         rowView = inflater.inflate(R.layout.new_game_list, null);
-        holder.tvDisplayName =(TextView) rowView.findViewById(R.id.NewGameList_displayName);
-        holder.cibAvatar=(CircularImageButton) rowView.findViewById(R.id.NewGameList_avatar);
+        holder.tvDisplayName = (TextView) rowView.findViewById(R.id.NewGameList_displayName);
+        holder.cibAvatar = (CircularImageButton) rowView.findViewById(R.id.NewGameList_avatar);
         holder.tvDisplayName.setText(user.get(position).getUserName());
-        holder.cibAvatar.setImageResource(user.get(position).getAvatar());
+        holder.cibAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(user.get(position).getAvatarURL()));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
