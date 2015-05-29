@@ -483,7 +483,7 @@ public class DataSource {
         values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatar());
-        database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = " + friend.getId(), null);
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatar() + "");
+        database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null);
     }
 } 

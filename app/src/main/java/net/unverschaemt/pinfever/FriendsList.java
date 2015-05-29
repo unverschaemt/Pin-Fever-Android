@@ -179,7 +179,7 @@ public class FriendsList extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        serverAPI.connect(serverAPI.urlAddFriend, "", jsonParam, new Connector() {
+        serverAPI.connect(serverAPI.urlAddFriend, friendId, jsonParam, new Connector() {
             @Override
             protected void onPostExecute(String resultString) {
                 JSONObject result = null;
