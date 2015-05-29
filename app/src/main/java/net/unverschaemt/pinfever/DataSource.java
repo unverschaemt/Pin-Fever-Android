@@ -18,8 +18,7 @@ public class DataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
     private String[] allColumnsFriends = {MySQLiteHelper.FRIENDS_COLUMN_ID,
-            MySQLiteHelper.FRIENDS_COLUMN_USERNAME, MySQLiteHelper.FRIENDS_COLUMN_SCORE,
-            MySQLiteHelper.FRIENDS_COLUMN_AVATAR};
+            MySQLiteHelper.FRIENDS_COLUMN_USERNAME, MySQLiteHelper.FRIENDS_COLUMN_SCORE};
     private String[] allColumnsGames = {MySQLiteHelper.GAMES_COLUMN_ID,
             MySQLiteHelper.GAMES_COLUMN_STATE, MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND};
     private String[] allColumnsQuestions = {MySQLiteHelper.QUESTIONS_COLUMN_ID,
@@ -53,7 +52,6 @@ public class DataSource {
         values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatarURL());
         database.insert(MySQLiteHelper.TABLE_FRIENDS, null, values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_FRIENDS,
                 allColumnsFriends, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null,
@@ -93,7 +91,6 @@ public class DataSource {
         friend.setId(cursor.getString(0));
         friend.setUserName(cursor.getString(1));
         friend.setScore(cursor.getInt(2));
-        friend.setAvatar(cursor.getString(3));
         return friend;
     }
 
@@ -483,7 +480,6 @@ public class DataSource {
         values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_AVATAR, friend.getAvatarURL() + "");
         database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null);
     }
 

@@ -53,7 +53,7 @@ public class NewGameGridAdapter extends BaseAdapter {
         holder.tvDisplayName = (TextView) rowView.findViewById(R.id.NewGameList_displayName);
         holder.cibAvatar = (CircularImageButton) rowView.findViewById(R.id.NewGameList_avatar);
         holder.tvDisplayName.setText(user.get(position).getUserName());
-        holder.cibAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(user.get(position).getAvatarURL()));
+        holder.cibAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(user.get(position).getAvatar()));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

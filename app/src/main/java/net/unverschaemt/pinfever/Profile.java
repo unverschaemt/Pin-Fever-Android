@@ -1,14 +1,25 @@
 package net.unverschaemt.pinfever;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -17,6 +28,7 @@ import com.koushikdutta.ion.Ion;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,6 +48,13 @@ public class Profile extends Activity {
         setContentView(R.layout.activity_profile);
         dataSource = new DataSource(this);
         serverAPI = new ServerAPI(this);
+        showProfile(Home.ownUser);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void showProfile(User user) {
+        CircularImageButton imageButton = (CircularImageButton) findViewById(R.id.Profile_avatar);
+        imageButton.setImageBitmap(user.getAvatar());
     }
 
     public void signOut(View view) {
@@ -105,26 +124,25 @@ public class Profile extends Activity {
             case SELECT_PHOTO:
                 if (resultCode == RESULT_OK) {
                     final Uri imageUri = imageReturnedIntent.getData();
-                    CircularImageButton imageButton = (CircularImageButton) findViewById(R.id.Profile_avatar);
                     Bitmap bitmap = null;
                     try {
                         bitmap = AvatarHandler.decodeUri(this, imageUri);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    imageButton.setImageBitmap(bitmap);
-                    updateAvatar(bitmap);
+                    updateAvatar(bitmap, Home.ownUser.getId());
                 }
         }
     }
 
-    private void updateAvatar(Bitmap bitmap) {
-        saveAvatarOnDevice(bitmap);
-        updateAvatarOnServer(bitmap);
+    private void updateAvatar(Bitmap bitmap, String fileName) {
+        File image = AvatarHandler.saveAvatarToStorage(this, bitmap, fileName);
+        updateAvatarOnServer(image);
+        Home.ownUser.setAvatar(bitmap);
+        showProfile(Home.ownUser);
     }
 
-    private void updateAvatarOnServer(Bitmap bitmap) {
-        File f = convertBitmapToJPEGAndGetFile(bitmap);
+    private void updateAvatarOnServer(File f) {
         serverAPI.connect(ServerAPI.urlUploadAvatar, "", f, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
@@ -159,36 +177,4 @@ public class Profile extends Activity {
         return jsonString;
     }
 
-    private File convertBitmapToJPEGAndGetFile(Bitmap bitmap) {
-        //create a file to write bitmap data
-        File f = new File(this.getCacheDir(), "newAvatar.jpeg");
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//Convert bitmap to byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
-        byte[] bitmapdata = bos.toByteArray();
-
-//write the bytes in file
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(f);
-            fos.write(bitmapdata);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return f;
-    }
-
-    private void saveAvatarOnDevice(Bitmap bitmap) {
-        //TODO: save avatar on device
-    }
 }

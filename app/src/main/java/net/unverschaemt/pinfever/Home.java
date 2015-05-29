@@ -1,8 +1,12 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +17,11 @@ import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 
@@ -22,7 +30,6 @@ public class Home extends Activity {
     public final static String OWNUSER = "ownUser";
     public final static String OWNUSER_ID = "id";
     public final static String OWNUSER_SCORE = "score";
-    public final static String OWNUSER_AVATAR = "avatar";
     public final static String OWNUSER_DISPLAYNAME = "displayName";
 
     private TextView tvScore;
@@ -43,7 +50,11 @@ public class Home extends Activity {
         busyIndicator = (ProgressBar) findViewById(R.id.Home_progressBar);
         dataSource = new DataSource(this);
         serverAPI = new ServerAPI(this);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadProfileData();
     }
 
@@ -65,7 +76,9 @@ public class Home extends Activity {
 
     private void showDataFromOwnUser(User ownUser) {
         tvScore.setText(ownUser.getScore() + "");
-        cibAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(ownUser.getAvatarURL()));
+        if (ownUser.getAvatar() != null) {
+            cibAvatar.setImageBitmap(ownUser.getAvatar());
+        }
     }
 
     private User getOwnUserFromDatabase() {
@@ -77,7 +90,7 @@ public class Home extends Activity {
             ownUser.setId((String) info.get(OWNUSER_ID));
             ownUser.setUserName((String) info.get(OWNUSER_DISPLAYNAME));
             ownUser.setScore((Integer) info.get(OWNUSER_SCORE));
-            ownUser.setAvatar((String) info.get(OWNUSER_AVATAR));
+            ownUser.setAvatar(AvatarHandler.loadAvatarFromStorage(this, ownUser.getId()));
         }
         return ownUser;
     }
@@ -88,7 +101,6 @@ public class Home extends Activity {
         editor.putString(OWNUSER_ID, ownUser.getId());
         editor.putString(OWNUSER_DISPLAYNAME, ownUser.getUserName());
         editor.putInt(OWNUSER_SCORE, ownUser.getScore());
-        editor.putString(OWNUSER_AVATAR, ownUser.getAvatarURL());
         editor.commit();
     }
 
@@ -102,7 +114,16 @@ public class Home extends Activity {
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     JsonObject player = data.getAsJsonObject(ServerAPI.playerObject);
-                    User ownUser = ServerAPI.convertJSONToUser(player);
+                    final User ownUser = ServerAPI.convertJSONToUser(player);
+                    ContextWrapper cw = new ContextWrapper(getBaseContext());
+                    File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+                    serverAPI.downloadFile(ServerAPI.urlGetPlayer, ServerAPI.urlGetPlayerMe + "/img.jpeg", new File(directory, ownUser.getId() + ".jpeg"), new FutureCallback() {
+                        @Override
+                        public void onCompleted(Exception e, Object result) {
+                            ownUser.setAvatar(AvatarHandler.loadAvatarFromStorage(getBaseContext(), ownUser.getId()));
+                            showDataFromOwnUser(ownUser);
+                        }
+                    });
                     saveOwnUserInDatabase(ownUser);
                     showDataFromOwnUser(ownUser);
                 } else {

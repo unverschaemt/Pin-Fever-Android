@@ -63,7 +63,7 @@ public class GameListAdapter extends BaseAdapter {
         holder.tvUserName.setText(userFromParticipant.getUserName());
         holder.tvOwnScore.setText(games.get(position).getOwnScore() + "");
         holder.tvOpponentScore.setText(games.get(position).getOpponentScore() + "");
-        holder.imgAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(userFromParticipant.getAvatarURL()));
+        holder.imgAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(userFromParticipant.getAvatar()));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

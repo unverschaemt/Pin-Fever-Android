@@ -1,5 +1,7 @@
 package net.unverschaemt.pinfever;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -12,7 +14,7 @@ public class User implements Serializable {
     String name;
     String email;
     int score;
-    String avatar;
+    Bitmap avatar;
 
     public User() {
 
@@ -59,11 +61,11 @@ public class User implements Serializable {
         this.score = score;
     }
 
-    public String getAvatarURL() {
+    public Bitmap getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(Bitmap avatar) {
         this.avatar = avatar;
     }
 

@@ -62,7 +62,6 @@ public class ServerAPI {
         requestMethods.put(urlUploadAvatar, RequestMethod.POST);
         contentTypes.put(urlUploadAvatar, ContentType.FORM_DATA);
 
-
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -78,6 +77,15 @@ public class ServerAPI {
                 makePostRequest(urlRequest, urlParameters, postObject, callback);
                 break;
         }
+    }
+
+    public void downloadFile(String urlRequest, String urlParameters, File file, FutureCallback callback) {
+        Ion.with(context)
+                .load(ServerAPI.serverURL + urlRequest + urlParameters)
+                .addHeader(ServerAPI.paramAuthToken, getToken())
+                .write(file)
+                .setCallback(callback);
+        return;
     }
 
     private void makeGETRequest(String urlRequest, String urlParameters, FutureCallback callback) {
@@ -124,7 +132,6 @@ public class ServerAPI {
         player.setId(playerJSON.get(ServerAPI.id).getAsString());
         player.setUserName(playerJSON.get(ServerAPI.displayName).getAsString());
         player.setScore(playerJSON.get(ServerAPI.level).getAsInt());
-        player.setAvatar(R.mipmap.dummy_avatar + "");//TODO get real avatar
         return player;
     }
 

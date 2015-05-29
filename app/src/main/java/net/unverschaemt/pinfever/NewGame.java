@@ -48,7 +48,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         List<User> user = new ArrayList<User>();
         User randomUser = new User();
         randomUser.setUserName(getString(R.string.userName_random));
-        randomUser.setAvatar(R.mipmap.random_user_avatar + "");
+        //randomUser.setAvatar(R.mipmap.random_user_avatar); //TODO: save and load random user avatar as bitmap
         user.add(randomUser);
         DataSource dataSource = new DataSource(this);
         dataSource.open();

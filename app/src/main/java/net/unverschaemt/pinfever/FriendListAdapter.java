@@ -54,7 +54,7 @@ public class FriendListAdapter extends BaseAdapter {
         holder.tvUserName = (TextView) rowView.findViewById(R.id.FriendsList_userName);
         holder.imgAvatar = (ImageView) rowView.findViewById(R.id.FriendsList_avatar);
         holder.tvUserName.setText(friends.get(position).getUserName());
-        holder.imgAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(friends.get(position).getAvatarURL()));
+        holder.imgAvatar.setImageBitmap(AvatarHandler.getBitmapFromAvatarURL(friends.get(position).getAvatar()));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
