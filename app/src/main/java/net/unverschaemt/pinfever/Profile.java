@@ -125,21 +125,15 @@ public class Profile extends Activity {
 
     private void updateAvatarOnServer(Bitmap bitmap) {
         File f = convertBitmapToJPEGAndGetFile(bitmap);
-        Ion.with(this)
-                .load(ServerAPI.serverURL + ServerAPI.urlUploadAvatar)
-                .addHeader(ServerAPI.token, new ServerAPI(this).getToken())
-                .setMultipartFile("bild.jpeg", "image/jpeg", f)
-                .setMultipartContentType("multipart/form-data")
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        JsonObject jsonObject = (JsonObject) result;
-                        if (!jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
-                            ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
-                        }
-                    }
-                });
+        serverAPI.connect(ServerAPI.urlUploadAvatar, "", f, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+                JsonObject jsonObject = (JsonObject) result;
+                if (!jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                }
+            }
+        });
     }
 
     private String readStream(InputStream in) {
