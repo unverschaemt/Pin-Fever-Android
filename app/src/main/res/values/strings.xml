@@ -51,4 +51,9 @@
     <string name="sessionExpired">Session expired! Please sign in again!</string>
     <string name="message_UserNotFound">User not found!</string>
     <string name="message_NoInternetConnection">No internet connection</string>
+    <string name="displayName">New Text</string>
+    <string name="lable_displayName">Display Name:</string>
+    <string name="change">change</string>
+    <string name="message_changeDisplayName">Change Your Display Name</string>
+    <string name="changeDisplayName">Change Display Name</string>
 </resources>

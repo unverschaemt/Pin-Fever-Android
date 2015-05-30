@@ -1,36 +1,25 @@
 package net.unverschaemt.pinfever;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.ContextWrapper;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,19 +31,68 @@ public class Profile extends Activity {
     private DataSource dataSource;
     private ServerAPI serverAPI;
 
+    private TextView tvDisplayName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        tvDisplayName = (TextView) findViewById(R.id.Profile_tvDisplayName);
         dataSource = new DataSource(this);
         serverAPI = new ServerAPI(this);
         showProfile(Home.ownUser);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void showProfile(User user) {
         CircularImageButton imageButton = (CircularImageButton) findViewById(R.id.Profile_avatar);
         imageButton.setImageBitmap(user.getAvatar());
+        tvDisplayName.setText(user.getUserName());
+    }
+
+    public void changeDisplayName(View view) {
+        openDialogToChangeDisplayName();
+    }
+
+    public void openDialogToChangeDisplayName() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle(getString(R.string.changeDisplayName));
+        alert.setMessage(getString(R.string.message_changeDisplayName));
+
+        final EditText input = new EditText(this);
+        alert.setView(input);
+
+        alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String newDisplayName = input.getText().toString();
+                setNewDisplayName(newDisplayName);
+            }
+        });
+
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    private void setNewDisplayName(String newDisplayName) {
+        Home.ownUser.setUserName(newDisplayName);
+        tvDisplayName.setText(newDisplayName);
+        SharedPreferences sharedPreferences = getSharedPreferences(Home.OWNUSER, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Home.OWNUSER_DISPLAYNAME, newDisplayName);
+        editor.commit();
+        JsonObject jsonParam = new JsonObject();
+        jsonParam.addProperty(ServerAPI.paramDisplayName, newDisplayName);
+        serverAPI.connect(ServerAPI.urlSetPlayer, "", jsonParam, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+
+            }
+        });
     }
 
     public void signOut(View view) {

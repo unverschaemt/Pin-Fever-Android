@@ -44,6 +44,7 @@ public class ServerAPI {
     public final static String urlFriendsList = "/players/me/friends";
     public final static String urlPlayersSearch = "/players/search/";
     public final static String urlGetPlayer = "/players/";
+    public final static String urlSetPlayer = "/players/me/set";
     public final static String urlUploadAvatar = "/players/me/avatarupload";
     public final static String urlGetPlayerMe = "me";
     public final static String urlFindAutoGame = "/turnbasedmatches/findauto";
@@ -63,6 +64,8 @@ public class ServerAPI {
         requestMethods.put(urlFriendsList, RequestMethod.GET);
         requestMethods.put(urlPlayersSearch, RequestMethod.GET);
         requestMethods.put(urlGetPlayer, RequestMethod.GET);
+        requestMethods.put(urlSetPlayer, RequestMethod.POST);
+        contentTypes.put(urlSetPlayer, ContentType.JSON);
         requestMethods.put(urlUploadAvatar, RequestMethod.POST);
         contentTypes.put(urlUploadAvatar, ContentType.FORM_DATA);
         requestMethods.put(urlFindAutoGame, RequestMethod.POST);

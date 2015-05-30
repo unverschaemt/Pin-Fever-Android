@@ -28,4 +28,36 @@
         android:layout_alignParentEnd="true"
         android:onClick="signOut" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Display Name:"
+        android:id="@+id/Profile_lableDisplayName"
+        android:layout_marginTop="60dp"
+        android:layout_toLeftOf="@+id/Profile_tvDisplayName"
+        android:layout_toStartOf="@+id/Profile_tvDisplayName"
+        android:layout_below="@+id/Profile_avatar" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Profile_tvDisplayName"
+        android:layout_toStartOf="@+id/Profile_signOut"
+        android:layout_alignBaseline="@+id/Profile_lableDisplayName"
+        android:inputType="text"
+        android:layout_alignLeft="@+id/Profile_avatar"
+        android:focusableInTouchMode="false"
+        android:editable="false"
+        android:onClick="changeDisplayName" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/change"
+        android:id="@+id/Profile_changeDisplayName"
+        android:layout_toRightOf="@+id/Profile_tvDisplayName"
+        android:layout_toEndOf="@+id/Profile_tvDisplayName"
+        android:onClick="changeDisplayName"
+        android:layout_alignBaseline="@+id/Profile_lableDisplayName" />
+
 </RelativeLayout>
