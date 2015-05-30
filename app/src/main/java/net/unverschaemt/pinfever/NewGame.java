@@ -19,6 +19,9 @@ import java.util.List;
 
 
 public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
+
+    final static int numberOfFriendsToPlayWith = 1;
+
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
     private ServerAPI serverAPI;
@@ -30,6 +33,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         completionView.setTokenListener(this);
+        completionView.setTokenLimit(numberOfFriendsToPlayWith);
         serverAPI = new ServerAPI(this);
         fillGridLayout();
     }
@@ -71,6 +75,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     private User getRandomUser() {
         User randomUser = new User();
         randomUser.setUserName(getString(R.string.userName_random));
+        randomUser.setId("random");
         Bitmap randomUserAvatar = BitmapFactory.decodeResource(getResources(), R.mipmap.random_user_avatar);
         randomUser.setAvatar(randomUserAvatar);
         return randomUser;

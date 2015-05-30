@@ -32,11 +32,11 @@ public class UserAutoCompleteView extends TokenCompleteTextView {
 
     @Override
     protected View getViewForObject(Object o) {
-        User p = (User)o;
+        User p = (User) o;
 
-        LayoutInflater l = (LayoutInflater)getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        LinearLayout view = (LinearLayout)l.inflate(R.layout.user_token, (ViewGroup)UserAutoCompleteView.this.getParent(), false);
-        ((TextView)view.findViewById(R.id.UserToken_name)).setText(p.getUserName());
+        LayoutInflater l = (LayoutInflater) getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        LinearLayout view = (LinearLayout) l.inflate(R.layout.user_token, (ViewGroup) UserAutoCompleteView.this.getParent(), false);
+        ((TextView) view.findViewById(R.id.UserToken_name)).setText(p.getUserName());
 
         return view;
     }
