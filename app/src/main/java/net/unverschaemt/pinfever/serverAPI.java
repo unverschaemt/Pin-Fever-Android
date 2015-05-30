@@ -2,6 +2,8 @@ package net.unverschaemt.pinfever;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.StrictMode;
 
 import com.google.gson.JsonObject;
@@ -9,6 +11,7 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -68,24 +71,43 @@ public class ServerAPI {
     }
 
     public void connect(String urlRequest, String urlParameters, Object postObject, FutureCallback callback) {
-        RequestMethod requestMethod = requestMethods.get(urlRequest);
-        switch (requestMethod) {
-            case GET:
-                makeGETRequest(urlRequest, urlParameters, callback);
-                break;
-            case POST:
-                makePostRequest(urlRequest, urlParameters, postObject, callback);
-                break;
+        ConnectivityManager connMgr = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            RequestMethod requestMethod = requestMethods.get(urlRequest);
+            switch (requestMethod) {
+                case GET:
+                    makeGETRequest(urlRequest, urlParameters, callback);
+                    break;
+                case POST:
+                    makePostRequest(urlRequest, urlParameters, postObject, callback);
+                    break;
+            }
+        } else {
+            JsonObject error = new JsonObject();
+            error.addProperty(errorObject, "connection failed");
+            error.addProperty(errorInfo, context.getString(R.string.message_NoInternetConnection));
+            callback.onCompleted(null, error);
         }
     }
 
     public void downloadFile(String urlRequest, String urlParameters, File file, FutureCallback callback) {
-        Ion.with(context)
-                .load(ServerAPI.serverURL + urlRequest + urlParameters)
-                .addHeader(ServerAPI.paramAuthToken, getToken())
-                .write(file)
-                .setCallback(callback);
-        return;
+        ConnectivityManager connMgr = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            Ion.with(context)
+                    .load(ServerAPI.serverURL + urlRequest + urlParameters)
+                    .addHeader(ServerAPI.paramAuthToken, getToken())
+                    .write(file)
+                    .setCallback(callback);
+        } else {
+            JsonObject error = new JsonObject();
+            error.addProperty(errorObject, "connection failed");
+            error.addProperty(errorInfo, context.getString(R.string.message_NoInternetConnection));
+            callback.onCompleted(null, error);
+        }
     }
 
     private void makeGETRequest(String urlRequest, String urlParameters, FutureCallback callback) {
