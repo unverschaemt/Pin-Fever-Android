@@ -9,12 +9,12 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
 
-    String userName;
-    String id;
-    String name;
-    String email;
-    int score;
-    Bitmap avatar;
+    private String userName;
+    private String id;
+    private String name;
+    private String email;
+    private int score;
+    private Bitmap avatar;
 
     public User() {
 

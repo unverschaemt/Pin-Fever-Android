@@ -20,7 +20,7 @@
         android:layout_alignParentEnd="false"
         android:background="@mipmap/add_friend"
         android:layout_alignParentTop="true"
-        android:onClick="tryToAddFriend" />
+        android:onClick="openDialogToAddAFriend" />
 
     <ListView
         android:layout_width="match_parent"

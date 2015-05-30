@@ -2,24 +2,20 @@ package net.unverschaemt.pinfever;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,6 +24,7 @@ public class FriendsList extends Activity {
     private List<User> friends;
     private DataSource dataSource;
     private ProgressBar busyIndicator;
+    private FriendsHandler friendsHandler;
 
     private ServerAPI serverAPI;
 
@@ -38,60 +35,17 @@ public class FriendsList extends Activity {
         serverAPI = new ServerAPI(this);
         busyIndicator = (ProgressBar) findViewById(R.id.FriendsList_progressBar);
         dataSource = new DataSource(this);
+        friendsHandler = new FriendsHandler(this);
 
-        friends = getFriends();
-        fillFriendsList(friends);
-    }
-
-    private List<User> getFriends() {
-        dataSource.open();
-        List<User> friends = dataSource.getAllFriends();
-        dataSource.close();
-        for (User friend : friends) {
-            friend.setAvatar(AvatarHandler.loadAvatarFromStorage(this, friend.getId()));
-        }
-        updateFriendsFromServer();
-        return friends;
-    }
-
-    private void updateFriendsFromServer() {
         busyIndicator.setVisibility(View.VISIBLE);
-        serverAPI.connect(ServerAPI.urlFriendsList, "", null, new FutureCallback() {
+        friends = friendsHandler.getFriends(new FriendsCallback() {
             @Override
-            public void onCompleted(Exception e, Object result) {
+            public void onFriendsLoaded(List<User> friends) {
                 busyIndicator.setVisibility(View.GONE);
-                JsonObject jsonObject = (JsonObject) result;
-                final List<User> friends = new ArrayList<User>();
-                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
-                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
-                    JsonArray friendsJSON = data.getAsJsonArray(ServerAPI.friends);
-                    for (final JsonElement friend : friendsJSON) {
-                        final User newFriend = ServerAPI.convertJSONToUser(friend.getAsJsonObject());
-                        ContextWrapper cw = new ContextWrapper(getBaseContext());
-                        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-                        serverAPI.downloadFile(ServerAPI.urlGetPlayer, newFriend.getId() + "/img.jpeg", new File(directory, newFriend.getId() + ".jpeg"), new FutureCallback() {
-                            @Override
-                            public void onCompleted(Exception e, Object result) {
-                                newFriend.setAvatar(AvatarHandler.loadAvatarFromStorage(getBaseContext(), newFriend.getId()));
-                                fillFriendsList(friends);
-                            }
-                        });
-                        friends.add(newFriend);
-                    }
-                    updateFriendsList(friends);
-                } else {
-                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
-                }
+                fillFriendsList(friends);
             }
         });
-    }
-
-    private void updateFriendsList(List<User> friends) {
-        this.friends = friends;
-        dataSource.open();
-        dataSource.updateFriends(friends);
-        dataSource.close();
-        fillFriendsList(this.friends);
+        fillFriendsList(friends);
     }
 
     private void updateFriendsList(User friend) {
@@ -124,7 +78,7 @@ public class FriendsList extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tryToAddFriend(View view) {
+    public void openDialogToAddAFriend(View view) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         alert.setTitle(getString(R.string.addFriend));
@@ -135,8 +89,8 @@ public class FriendsList extends Activity {
 
         alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                String friendName = input.getText().toString();
-                searchForFriendAndAddIfFriendExists(friendName);
+                String searchKey = input.getText().toString();
+                tryToAddTheFriend(searchKey);
             }
         });
 
@@ -149,27 +103,28 @@ public class FriendsList extends Activity {
         alert.show();
     }
 
-    private void searchForFriendAndAddIfFriendExists(String friendName) {
+    private void tryToAddTheFriend(String searchKey) {
         busyIndicator.setVisibility(View.VISIBLE);
-        serverAPI.connect(serverAPI.urlPlayersSearch, friendName, null, new FutureCallback() {
+        friendsHandler.getPlayer(searchKey, new GetPlayerCallback() {
+            @Override
+            public void onPlayerLoaded(User player) {
+                busyIndicator.setVisibility(View.GONE);
+                if (player != null) {
+                    addFriend(player);
+                }
+            }
+        });
+    }
+
+    private void addFriend(final User friend) {
+        JsonObject jsonParam = new JsonObject();
+        jsonParam.addProperty(ServerAPI.paramPlayerId, friend.getId());
+        serverAPI.connect(serverAPI.urlAddFriend, friend.getId(), jsonParam, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
-                busyIndicator.setVisibility(View.GONE);
                 JsonObject jsonObject = (JsonObject) result;
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
-                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
-                    JsonArray players = data.getAsJsonArray(ServerAPI.players);
-                    if (players.size() > 0) {
-                        JsonObject playerJSON = players.get(0).getAsJsonObject();
-                        addFriend(playerJSON.get(ServerAPI.id).getAsString());
-                        User player = ServerAPI.convertJSONToUser(playerJSON);
-                        updateFriendsList(player);
-                    } else {
-                        JsonObject userNotFoundObject = new JsonObject();
-                        userNotFoundObject.addProperty(ServerAPI.errorInfo, getString(R.string.message_UserNotFound));
-                        userNotFoundObject.addProperty(ServerAPI.errorObject, "");
-                        ErrorHandler.showErrorMessage(userNotFoundObject, getBaseContext());
-                    }
+                    updateFriendsList(friend);
                 } else {
                     ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
                 }
@@ -177,23 +132,9 @@ public class FriendsList extends Activity {
         });
     }
 
-    private void addFriend(final String friendId) {
-        JsonObject jsonParam = new JsonObject();
-        jsonParam.addProperty(ServerAPI.paramPlayerId, friendId);
-        serverAPI.connect(serverAPI.urlAddFriend, friendId, jsonParam, new FutureCallback() {
-            @Override
-            public void onCompleted(Exception e, Object result) {
-                busyIndicator.setVisibility(View.GONE);
-                JsonObject jsonObject = (JsonObject) result;
-                if (!jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
-                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
-                }
-            }
-        });
-    }
-
     public void fillFriendsList(List<User> friends) {
+        this.friends = friends;
         ListView friendsList = (ListView) findViewById(R.id.FriendsList_friends);
-        friendsList.setAdapter(new FriendListAdapter(this, friends));
+        friendsList.setAdapter(new FriendListAdapter(this, this.friends));
     }
 }
