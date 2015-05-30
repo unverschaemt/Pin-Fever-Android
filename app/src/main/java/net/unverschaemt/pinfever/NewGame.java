@@ -50,16 +50,30 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     private List<User> getUser() {
         List<User> user = new ArrayList<User>();
+        User randomUser = getRandomUser();
+        user.add(randomUser);
+        user.addAll(new FriendsHandler(this).getFriends(new FriendsCallback() {
+            @Override
+            public void onFriendsLoaded(List<User> friends) {
+                List<User> player = new ArrayList<User>();
+                player.add(getRandomUser());
+                player.addAll(friends);
+                GridView layout = (GridView) findViewById(R.id.NewGame_gridLayout);
+                layout.setAdapter(new NewGameGridAdapter(getBaseContext(), player, completionView));
+
+                adapter = new ArrayAdapter<User>(getBaseContext(), android.R.layout.simple_list_item_1, player);
+                completionView.setAdapter(adapter);
+            }
+        }));
+        return user;
+    }
+
+    private User getRandomUser() {
         User randomUser = new User();
         randomUser.setUserName(getString(R.string.userName_random));
         Bitmap randomUserAvatar = BitmapFactory.decodeResource(getResources(), R.mipmap.random_user_avatar);
         randomUser.setAvatar(randomUserAvatar);
-        user.add(randomUser);
-        DataSource dataSource = new DataSource(this);
-        dataSource.open();
-        user.addAll(dataSource.getAllFriends());
-        dataSource.close();
-        return user;
+        return randomUser;
     }
 
     @Override
@@ -88,7 +102,6 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     public void onTokenAdded(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
         popup.setVisibility(View.VISIBLE);
-
     }
 
     @Override
