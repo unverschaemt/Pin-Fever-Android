@@ -46,6 +46,7 @@ public class ServerAPI {
     public final static String urlGetPlayer = "/players/";
     public final static String urlUploadAvatar = "/players/me/avatarupload";
     public final static String urlGetPlayerMe = "me";
+    public final static String urlFindAutoGame = "/turnbasedmatches/findauto";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
@@ -64,6 +65,8 @@ public class ServerAPI {
         requestMethods.put(urlGetPlayer, RequestMethod.GET);
         requestMethods.put(urlUploadAvatar, RequestMethod.POST);
         contentTypes.put(urlUploadAvatar, ContentType.FORM_DATA);
+        requestMethods.put(urlFindAutoGame, RequestMethod.POST);
+        contentTypes.put(urlFindAutoGame, ContentType.JSON);
 
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();

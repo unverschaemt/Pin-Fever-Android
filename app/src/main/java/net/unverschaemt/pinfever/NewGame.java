@@ -11,7 +11,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 import com.tokenautocomplete.TokenCompleteTextView;
 
 import java.util.ArrayList;
@@ -25,12 +28,14 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
     private ServerAPI serverAPI;
+    private ProgressBar busyIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        busyIndicator = (ProgressBar) findViewById(R.id.NewGame_progressBar);
         completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         completionView.setTokenListener(this);
         completionView.setTokenLimit(numberOfFriendsToPlayWith);
@@ -118,7 +123,13 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     }
 
     public void start(View view) {
-        Intent intent = new Intent(this, CategoryChooser.class);
-        startActivity(intent);
+        busyIndicator.setVisibility(View.VISIBLE);
+        JsonObject jsonParam = new JsonObject();
+        serverAPI.connect(ServerAPI.urlFindAutoGame, "", jsonParam, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+                busyIndicator.setVisibility(View.GONE);
+            }
+        });
     }
 }
