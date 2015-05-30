@@ -466,8 +466,11 @@ public class DataSource {
     public void updateFriends(List<User> newFriends) {
         List<User> oldFriends = getAllFriends();
         for (User friend : newFriends) {
-            updateFriend(friend);
-
+            if (oldFriends.contains(friend)) {
+                updateFriend(friend);
+            } else {
+                createFriend(friend);
+            }
         }
         oldFriends.removeAll(newFriends);
         for (User friend : oldFriends) {
