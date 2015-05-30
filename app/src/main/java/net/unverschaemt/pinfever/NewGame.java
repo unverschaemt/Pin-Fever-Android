@@ -2,6 +2,8 @@ package net.unverschaemt.pinfever;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +21,7 @@ import java.util.List;
 public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
+    private ServerAPI serverAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         completionView = (UserAutoCompleteView) findViewById(R.id.NewGame_participants);
         completionView.setTokenListener(this);
+        serverAPI = new ServerAPI(this);
         fillGridLayout();
     }
 
@@ -48,7 +52,8 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         List<User> user = new ArrayList<User>();
         User randomUser = new User();
         randomUser.setUserName(getString(R.string.userName_random));
-        //randomUser.setAvatar(R.mipmap.random_user_avatar); //TODO: save and load random user avatar as bitmap
+        Bitmap randomUserAvatar = BitmapFactory.decodeResource(getResources(), R.mipmap.random_user_avatar);
+        randomUser.setAvatar(randomUserAvatar);
         user.add(randomUser);
         DataSource dataSource = new DataSource(this);
         dataSource.open();
