@@ -59,32 +59,32 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_FRIENDS_DATABASE = "create table "
             + TABLE_FRIENDS + "(" + FRIENDS_COLUMN_ID
-            + " text, " + FRIENDS_COLUMN_USERNAME
+            + " text primary key, " + FRIENDS_COLUMN_USERNAME
             + " text, " + FRIENDS_COLUMN_SCORE + " integer, " + FRIENDS_COLUMN_AVATAR + " text );";
 
     private static final String CREATE_GAMES_DATABASE = "create table "
             + TABLE_GAMES + "(" + GAMES_COLUMN_ID
-            + " long primary key, " + GAMES_COLUMN_STATE
-            + " integer, " + GAMES_COLUMN_ACTIVE_ROUND + " long );";
+            + " text primary key, " + GAMES_COLUMN_STATE
+            + " integer, " + GAMES_COLUMN_ACTIVE_ROUND + " text );";
 
     private static final String CREATE_QUESTIONS_DATABASE = "create table " + TABLE_QUESTIONS + "("
-            + QUESTIONS_COLUMN_ID + " long primary key, "
+            + QUESTIONS_COLUMN_ID + " text primary key, "
             + QUESTIONS_COLUMN_TEXT + " text, "
-            + QUESTIONS_COLUMN_ROUND + " long, "
+            + QUESTIONS_COLUMN_ROUND + " text, "
             + QUESTIONS_COLUMN_ANSWER_LAT + " float, "
             + QUESTIONS_COLUMN_ANSWER_LONG + " float, "
             + QUESTIONS_COLUMN_STATE + " integer, "
-            + QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE + " long );";
+            + QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE + " text );";
 
     private static final String CREATE_ROUNDS_DATABASE = "create table " + TABLE_ROUNDS + "("
-            + ROUNDS_COLUMN_ID + " long primary key, "
+            + ROUNDS_COLUMN_ID + " text primary key, "
             + ROUNDS_COLUMN_CATEGORY + " text, "
-            + ROUNDS_COLUMN_GAME + " long );";
+            + ROUNDS_COLUMN_GAME + " text );";
 
     private static final String CREATE_TURNINFORMATION_DATABASE = "create table " + TABLE_TURNINFORMATION + "("
-            + TURNINFORMATION_COLUMN_ID + " long primary key, "
-            + TURNINFORMATION_COLUMN_QUESTION + " long, "
-            + TURNINFORMATION_COLUMN_PARTICIPANT + " long, "
+            + TURNINFORMATION_COLUMN_ID + " text primary key, "
+            + TURNINFORMATION_COLUMN_QUESTION + " text, "
+            + TURNINFORMATION_COLUMN_PARTICIPANT + " text, "
             + TURNINFORMATION_COLUMN_LAT + " float, "
             + TURNINFORMATION_COLUMN_LONG + " float, "
             + TURNINFORMATION_COLUMN_DISTANCE + " float );";
@@ -92,7 +92,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String CREATE_PARTICIPANTS_DATABASE = "create table " + TABLE_PARTICIPANTS + "("
             + PARTICIPANTS_COLUMN_ID + " text primary key, "
             + PARTICIPANTS_COLUMN_PLAYER + " text, "
-            + PARTICIPANTS_COLUMN_GAME + " long, "
+            + PARTICIPANTS_COLUMN_GAME + " text, "
             + PARTICIPANTS_COLUMN_STATE + " int, "
             + PARTICIPANTS_COLUMN_SCORE + " int );";
 

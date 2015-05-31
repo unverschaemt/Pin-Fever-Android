@@ -53,13 +53,7 @@ public class DataSource {
         values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
         values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
         database.insert(MySQLiteHelper.TABLE_FRIENDS, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_FRIENDS,
-                allColumnsFriends, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null,
-                null, null, null);
-        cursor.moveToFirst();
-        User newUser = cursorToFriend(cursor);
-        cursor.close();
-        return newUser;
+        return friend;
     }
 
     public void deleteFriend(User user) {
@@ -86,381 +80,12 @@ public class DataSource {
         return friends;
     }
 
-    private User cursorToFriend(Cursor cursor) {
-        User friend = new User();
-        friend.setId(cursor.getString(0));
-        friend.setUserName(cursor.getString(1));
-        friend.setScore(cursor.getInt(2));
-        return friend;
-    }
-
-    public Game updateGame(GameDTO game) {
+    private void updateFriend(User friend) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.id);
-        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.state);
-        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.activeRound);
-        database.update(MySQLiteHelper.TABLE_GAMES, values, MySQLiteHelper.GAMES_COLUMN_ID + " = " + game.id, null);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_GAMES,
-                allColumnsGames, MySQLiteHelper.GAMES_COLUMN_ID + " = " + game.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Game newGame = cursorToGame(cursor);
-        cursor.close();
-        List<Round> rounds = new ArrayList<Round>();
-        if (game.rounds != null) {
-            for (RoundDTO round : game.rounds) {
-                rounds.add(updateRound(round));
-            }
-        }
-        newGame.setRounds(rounds);
-        List<Participant> participants = new ArrayList<Participant>();
-        if (game.participants != null) {
-            for (ParticipantDTO participant : game.participants) {
-                participants.add(updateParticipant(participant));
-            }
-        }
-        newGame.setParticipants(participants);
-        return newGame;
-    }
-
-    public Game updateGame(Game game) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.getId());
-        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
-        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
-        database.update(MySQLiteHelper.TABLE_GAMES, values, MySQLiteHelper.GAMES_COLUMN_ID + " = " + game.getId(), null);
-        List<Round> rounds = new ArrayList<Round>();
-        if (game.getRounds() != null) {
-            for (Round round : game.getRounds()) {
-                rounds.add(updateRound(round));
-            }
-        }
-        game.setRounds(rounds);
-        List<Participant> participants = new ArrayList<Participant>();
-        if (game.getParticipants() != null) {
-            for (Participant participant : game.getParticipants()) {
-                participants.add(updateParticipant(participant));
-            }
-        }
-        game.setParticipants(participants);
-        return game;
-    }
-
-    public void deleteGame(Game game) {
-        long id = game.getId();
-        System.out.println("Game deleted with id: " + id);
-        database.delete(MySQLiteHelper.TABLE_GAMES, MySQLiteHelper.GAMES_COLUMN_ID
-                + " = " + id, null);
-
-        Collection<Round> rounds = game.getRounds();
-        for (Round round : rounds) {
-            database.delete(MySQLiteHelper.TABLE_ROUNDS, MySQLiteHelper.ROUNDS_COLUMN_ID
-                    + " = " + round.getId(), null);
-            Collection<Question> questions = round.getQuestions();
-            for (Question question : questions) {
-                database.delete(MySQLiteHelper.TABLE_QUESTIONS, MySQLiteHelper.QUESTIONS_COLUMN_ID
-                        + " = " + question.getId(), null);
-                java.util.Map<Long, Turninformation> turninformation = question.getTurninformation();
-                for (Map.Entry<Long, Turninformation> turninfo : turninformation.entrySet()) {
-                    database.delete(MySQLiteHelper.TABLE_TURNINFORMATION, MySQLiteHelper.TURNINFORMATION_COLUMN_ID
-                            + " = " + turninfo.getValue().getId(), null);
-                }
-            }
-        }
-        Collection<Participant> participants = game.getParticipants();
-        for (Participant participant : participants) {
-            database.delete(MySQLiteHelper.TABLE_PARTICIPANTS, MySQLiteHelper.PARTICIPANTS_COLUMN_ID
-                    + " = " + participant.getId(), null);
-        }
-    }
-
-    public List<Game> getAllGames() {
-        List<Game> games = new ArrayList<Game>();
-
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_GAMES,
-                allColumnsGames, null, null, null, null, null);
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            Game game = cursorToGame(cursor);
-            game.setRounds(getAllRoundsForGameId(game.getId()));
-            if (game.getActiveRoundID() > -1) {
-                for (Round round : game.getRounds()) {
-                    if (round.getId() == game.getActiveRoundID()) {
-                        game.setActiveRound(round);
-                    }
-                }
-            }
-            game.setParticipants(getAllParticipantsForGameId(game.getId()));
-            games.add(game);
-            cursor.moveToNext();
-        }
-        // make sure to close the cursor
-        cursor.close();
-        return games;
-    }
-
-    private List<Participant> getAllParticipantsForGameId(long id) {
-        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_PARTICIPANTS + " WHERE "
-                + MySQLiteHelper.PARTICIPANTS_COLUMN_GAME + " = " + id;
-
-        Cursor cursor = database.rawQuery(selectQuery, null);
-
-        List<Participant> participants = new ArrayList<Participant>();
-        if (cursor.moveToFirst()) {
-            do {
-                Participant participant = cursorToParticipant(cursor);
-                participants.add(participant);
-            } while (cursor.moveToNext());
-        }
-        return participants;
-    }
-
-    public Participant createParticipant(ParticipantDTO participant) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.id);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.player);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_GAME, participant.game);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.state);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.score);
-        database.insert(MySQLiteHelper.TABLE_PARTICIPANTS, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_PARTICIPANTS,
-                allColumnsParticipants, MySQLiteHelper.PARTICIPANTS_COLUMN_ID + " = " + participant.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Participant newParticipant = cursorToParticipant(cursor);
-        cursor.close();
-        return newParticipant;
-    }
-
-    public Participant updateParticipant(ParticipantDTO participant) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.id);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.player);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_GAME, participant.game);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.state);
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.score);
-        database.update(MySQLiteHelper.TABLE_PARTICIPANTS, values, MySQLiteHelper.PARTICIPANTS_COLUMN_ID + " = " + participant.id, null);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_PARTICIPANTS,
-                allColumnsParticipants, MySQLiteHelper.PARTICIPANTS_COLUMN_ID + " = " + participant.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Participant newParticipant = cursorToParticipant(cursor);
-        cursor.close();
-        return newParticipant;
-    }
-
-    public Participant updateParticipant(Participant participant) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.getId());
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.getPlayer());
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.getState());
-        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.getScore());
-        database.update(MySQLiteHelper.TABLE_PARTICIPANTS, values, MySQLiteHelper.PARTICIPANTS_COLUMN_ID + " = " + participant.getId(), null);
-        return participant;
-    }
-
-    private Participant cursorToParticipant(Cursor cursor) {
-        Participant participant = new Participant();
-        participant.setId(cursor.getString(0));
-        participant.setPlayer(cursor.getString(1));
-        participant.setState(cursor.getInt(3));
-        participant.setScore(cursor.getInt(4));
-        return participant;
-    }
-
-    private List<Round> getAllRoundsForGameId(long id) {
-        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_ROUNDS + " WHERE "
-                + MySQLiteHelper.ROUNDS_COLUMN_GAME + " = " + id;
-
-        Cursor cursor = database.rawQuery(selectQuery, null);
-
-        List<Round> rounds = new ArrayList<Round>();
-        if (cursor.moveToFirst()) {
-            do {
-                Round round = cursorToRound(cursor);
-                round.setQuestions(getAllQuestionsForRoundId(round.getId()));
-                rounds.add(round);
-            } while (cursor.moveToNext());
-        }
-        return rounds;
-    }
-
-    private List<Question> getAllQuestionsForRoundId(long id) {
-        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_QUESTIONS + " WHERE "
-                + MySQLiteHelper.QUESTIONS_COLUMN_ROUND + " = " + id;
-
-        Cursor cursor = database.rawQuery(selectQuery, null);
-
-        List<Question> questions = new ArrayList<Question>();
-        if (cursor.moveToFirst()) {
-            do {
-                Question question = cursorToQuestion(cursor);
-                question.setTurninformation(getAllTurninformationForQuestionID(question.getId()));
-                questions.add(question);
-            } while (cursor.moveToNext());
-        }
-        return questions;
-    }
-
-    private HashMap<Long, Turninformation> getAllTurninformationForQuestionID(long id) {
-        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_TURNINFORMATION + " WHERE "
-                + MySQLiteHelper.TURNINFORMATION_COLUMN_QUESTION + " = " + id;
-
-        Cursor cursor = database.rawQuery(selectQuery, null);
-
-        HashMap<Long, Turninformation> turninformation = new HashMap<Long, Turninformation>();
-        if (cursor.moveToFirst()) {
-            do {
-                Turninformation info = cursorToTurninformation(cursor);
-                turninformation.put(cursor.getLong(2), info);
-            } while (cursor.moveToNext());
-        }
-        return turninformation;
-    }
-
-    private Turninformation cursorToTurninformation(Cursor cursor) {
-        Turninformation turninformation = new Turninformation();
-        turninformation.setId(cursor.getLong(0));
-        turninformation.setAnswerLat(cursor.getFloat(3));
-        turninformation.setAnswerLong(cursor.getFloat(4));
-        turninformation.setDistance(cursor.getFloat(5));
-        return turninformation;
-    }
-
-    private Game cursorToGame(Cursor cursor) {
-        Game game = new Game();
-        game.setID(cursor.getLong(0));
-        game.setState(GameState.values()[cursor.getInt(1)]);
-        game.setActiveRoundID(cursor.getLong(2));
-        return game;
-    }
-
-    public Question createQuestion(QuestionDTO question) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ID, question.id);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.text);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ROUND, question.round);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.answerLat);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.answerLong);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.state);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.participantWhoWon);
-        database.insert(MySQLiteHelper.TABLE_QUESTIONS, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_QUESTIONS,
-                allColumnsQuestions, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = " + question.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Question newQuestion = cursorToQuestion(cursor);
-        cursor.close();
-        return newQuestion;
-    }
-
-    public Question updateQuestion(QuestionDTO question) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ID, question.id);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.text);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ROUND, question.round);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.answerLat);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.answerLong);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.state);
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.participantWhoWon);
-        database.update(MySQLiteHelper.TABLE_QUESTIONS, values, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = " + question.id, null);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_QUESTIONS,
-                allColumnsQuestions, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = " + question.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Question newQuestion = cursorToQuestion(cursor);
-        cursor.close();
-        return newQuestion;
-    }
-
-    public Question updateQuestion(Question question) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ID, question.getId());
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.getText());
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.getAnswerLat());
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.getAnswerLong());
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.getState());
-        values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.getParticipantWhoWon());
-        database.update(MySQLiteHelper.TABLE_QUESTIONS, values, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = " + question.getId(), null);
-        return question;
-    }
-
-    private Question cursorToQuestion(Cursor cursor) {
-        Question question = new Question();
-        question.setId(cursor.getLong(0));
-        question.setText(cursor.getString(1));
-        question.setAnswerLat(cursor.getFloat(3));
-        question.setAnswerLong(cursor.getFloat(4));
-        question.setState(cursor.getInt(5));
-        question.setParticipantWhoWon(cursor.getInt(6));
-        return question;
-    }
-
-    public Round createRound(RoundDTO round) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_ID, round.id);
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_CATEGORY, round.category);
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_GAME, round.game);
-        database.insert(MySQLiteHelper.TABLE_ROUNDS, null, values);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_ROUNDS,
-                allColumnsRounds, MySQLiteHelper.ROUNDS_COLUMN_ID + " = " + round.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Round newRound = cursorToRound(cursor);
-        cursor.close();
-        List<Question> questions = new ArrayList<Question>();
-        if (round.questions != null) {
-            for (QuestionDTO question : round.questions) {
-                questions.add(createQuestion(question));
-            }
-        }
-        newRound.setQuestions(questions);
-        return newRound;
-    }
-
-    public Round updateRound(RoundDTO round) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_ID, round.id);
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_CATEGORY, round.category);
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_GAME, round.game);
-        database.update(MySQLiteHelper.TABLE_ROUNDS, values, MySQLiteHelper.ROUNDS_COLUMN_ID + " = " + round.id, null);
-        Cursor cursor = database.query(MySQLiteHelper.TABLE_ROUNDS,
-                allColumnsRounds, MySQLiteHelper.ROUNDS_COLUMN_ID + " = " + round.id, null,
-                null, null, null);
-        cursor.moveToFirst();
-        Round newRound = cursorToRound(cursor);
-        cursor.close();
-        List<Question> questions = new ArrayList<Question>();
-        if (round.questions != null) {
-            for (QuestionDTO question : round.questions) {
-                questions.add(updateQuestion(question));
-            }
-        }
-        newRound.setQuestions(questions);
-        return newRound;
-    }
-
-    public Round updateRound(Round round) {
-        ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_ID, round.getId());
-        values.put(MySQLiteHelper.ROUNDS_COLUMN_CATEGORY, round.getCategory());
-        database.update(MySQLiteHelper.TABLE_ROUNDS, values, MySQLiteHelper.ROUNDS_COLUMN_ID + " = " + round.getId(), null);
-        List<Question> questions = new ArrayList<Question>();
-        if (round.getQuestions() != null) {
-            for (Question question : round.getQuestions()) {
-                questions.add(updateQuestion(question));
-            }
-        }
-        round.setQuestions(questions);
-        return round;
-    }
-
-    private Round cursorToRound(Cursor cursor) {
-        Round round = new Round();
-        round.setId(cursor.getLong(0));
-        round.setCategory(cursor.getString(1));
-        return round;
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
+        values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
+        database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null);
     }
 
     public void updateFriends(List<User> newFriends) {
@@ -478,12 +103,350 @@ public class DataSource {
         }
     }
 
-    private void updateFriend(User friend) {
+    private User cursorToFriend(Cursor cursor) {
+        User friend = new User();
+        friend.setId(cursor.getString(0));
+        friend.setUserName(cursor.getString(1));
+        friend.setScore(cursor.getInt(2));
+        return friend;
+    }
+
+    public Game createGame(Game game) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_ID, friend.getId());
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_USERNAME, friend.getUserName());
-        values.put(MySQLiteHelper.FRIENDS_COLUMN_SCORE, friend.getScore());
-        database.update(MySQLiteHelper.TABLE_FRIENDS, values, MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + friend.getId() + "\"", null);
+        values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.getId());
+        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
+        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
+        database.insert(MySQLiteHelper.TABLE_GAMES, null, values);
+        List<Round> rounds = game.getRounds();
+        if (rounds != null) {
+            for (Round round : rounds) {
+                createRound(round);
+            }
+        }
+        List<Participant> participants = game.getParticipants();
+        if (participants != null) {
+            for (Participant participant : participants) {
+                createParticipant(participant);
+            }
+        }
+        return game;
+    }
+
+    public void deleteGame(Game game) {
+        String id = game.getId();
+        System.out.println("Game deleted with id: " + id);
+        database.delete(MySQLiteHelper.TABLE_GAMES, MySQLiteHelper.GAMES_COLUMN_ID
+                + " = \"" + id + "\"", null);
+
+        Collection<Round> rounds = game.getRounds();
+        for (Round round : rounds) {
+            deleteRound(round);
+        }
+        Collection<Participant> participants = game.getParticipants();
+        for (Participant participant : participants) {
+            deleteParticipant(participant);
+        }
+    }
+
+    public List<Game> getAllGames() {
+        List<Game> games = new ArrayList<Game>();
+
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_GAMES,
+                allColumnsGames, null, null, null, null, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Game game = cursorToGame(cursor);
+            game.setRounds(getAllRoundsForGameId(game.getId()));
+            if (game.getActiveRound() != null) {
+                for (Round round : game.getRounds()) {
+                    if (round.getId() == game.getActiveRoundID()) {
+                        game.setActiveRound(round);
+                    }
+                }
+            }
+            game.setParticipants(getAllParticipantsForGameId(game.getId()));
+            games.add(game);
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+        return games;
+    }
+
+    public Game updateGame(Game game) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.getId());
+        values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
+        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
+        database.update(MySQLiteHelper.TABLE_GAMES, values, MySQLiteHelper.GAMES_COLUMN_ID + " = \"" + game.getId() + "\"", null);
+        List<Round> rounds = new ArrayList<Round>();
+        if (game.getRounds() != null) {
+            for (Round round : game.getRounds()) {
+                rounds.add(updateRound(round));
+            }
+        }
+        game.setRounds(rounds);
+        List<Participant> participants = new ArrayList<Participant>();
+        if (game.getParticipants() != null) {
+            for (Participant participant : game.getParticipants()) {
+                participants.add(updateParticipant(participant));
+            }
+        }
+        game.setParticipants(participants);
+        return game;
+    }
+
+    public void updateGames(List<Game> newGames) {
+        List<Game> oldGames = getAllGames();
+        for (Game game : newGames) {
+            if (oldGames.contains(game)) {
+                updateGame(game);
+            } else {
+                createGame(game);
+            }
+        }
+        oldGames.removeAll(newGames);
+        for (Game game : oldGames) {
+            deleteGame(game);
+        }
+    }
+
+    private Game cursorToGame(Cursor cursor) {
+        Game game = new Game();
+        game.setID(cursor.getString(0));
+        game.setState(GameState.values()[cursor.getInt(1)]);
+        game.setActiveRoundID(cursor.getString(2));
+        return game;
+    }
+
+    public Participant createParticipant(Participant participant) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.getId());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.getPlayer());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.getState());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.getScore());
+        database.insert(MySQLiteHelper.TABLE_PARTICIPANTS, null, values);
+        return participant;
+    }
+
+    private void deleteParticipant(Participant participant) {
+        database.delete(MySQLiteHelper.TABLE_PARTICIPANTS, MySQLiteHelper.PARTICIPANTS_COLUMN_ID
+                + " = \"" + participant.getId() + "\"", null);
+    }
+
+    private List<Participant> getAllParticipantsForGameId(String id) {
+        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_PARTICIPANTS + " WHERE "
+                + MySQLiteHelper.PARTICIPANTS_COLUMN_GAME + " = \"" + id + "\"";
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        List<Participant> participants = new ArrayList<Participant>();
+        if (cursor.moveToFirst()) {
+            do {
+                Participant participant = cursorToParticipant(cursor);
+                participants.add(participant);
+            } while (cursor.moveToNext());
+        }
+        return participants;
+    }
+
+    public Participant updateParticipant(Participant participant) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.getId());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.getPlayer());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.getState());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.getScore());
+        database.update(MySQLiteHelper.TABLE_PARTICIPANTS, values, MySQLiteHelper.PARTICIPANTS_COLUMN_ID + " = \"" + participant.getId() + "\"", null);
+        return participant;
+    }
+
+    private Participant cursorToParticipant(Cursor cursor) {
+        Participant participant = new Participant();
+        participant.setId(cursor.getString(0));
+        participant.setPlayer(cursor.getString(1));
+        participant.setState(cursor.getInt(3));
+        participant.setScore(cursor.getInt(4));
+        return participant;
+    }
+
+    public Round createRound(Round round) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.ROUNDS_COLUMN_ID, round.getId());
+        values.put(MySQLiteHelper.ROUNDS_COLUMN_CATEGORY, round.getCategory());
+        database.insert(MySQLiteHelper.TABLE_ROUNDS, null, values);
+        return round;
+    }
+
+    private void deleteRound(Round round) {
+        database.delete(MySQLiteHelper.TABLE_ROUNDS, MySQLiteHelper.ROUNDS_COLUMN_ID
+                + " = \"" + round.getId() + "\"", null);
+        Collection<Question> questions = round.getQuestions();
+        for (Question question : questions) {
+            deleteQuestion(question);
+        }
+    }
+
+    private List<Round> getAllRoundsForGameId(String id) {
+        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_ROUNDS + " WHERE "
+                + MySQLiteHelper.ROUNDS_COLUMN_GAME + " = \"" + id + "\"";
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        List<Round> rounds = new ArrayList<Round>();
+        if (cursor.moveToFirst()) {
+            do {
+                Round round = cursorToRound(cursor);
+                round.setQuestions(getAllQuestionsForRoundId(round.getId()));
+                rounds.add(round);
+            } while (cursor.moveToNext());
+        }
+        return rounds;
+    }
+
+    public Round updateRound(Round round) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.ROUNDS_COLUMN_ID, round.getId());
+        values.put(MySQLiteHelper.ROUNDS_COLUMN_CATEGORY, round.getCategory());
+        database.update(MySQLiteHelper.TABLE_ROUNDS, values, MySQLiteHelper.ROUNDS_COLUMN_ID + " = \"" + round.getId() + "\"", null);
+        List<Question> questions = new ArrayList<Question>();
+        if (round.getQuestions() != null) {
+            for (Question question : round.getQuestions()) {
+                questions.add(updateQuestion(question));
+            }
+        }
+        round.setQuestions(questions);
+        return round;
+    }
+
+    private Round cursorToRound(Cursor cursor) {
+        Round round = new Round();
+        round.setId(cursor.getString(0));
+        round.setCategory(cursor.getString(1));
+        return round;
+    }
+
+    public Question createQuestion(Question question) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ID, question.getId());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.getText());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.getAnswerLat());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.getAnswerLong());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.getState());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.getParticipantWhoWon());
+        database.insert(MySQLiteHelper.TABLE_QUESTIONS, null, values);
+        Map<String, Turninformation> turninformation = question.getTurninformation();
+        for (Map.Entry<String, Turninformation> turninfo : turninformation.entrySet()) {
+            createTurninformation(turninfo.getValue(), question.getId(), turninfo.getKey());
+        }
+        return question;
+    }
+
+    private void deleteQuestion(Question question) {
+        database.delete(MySQLiteHelper.TABLE_QUESTIONS, MySQLiteHelper.QUESTIONS_COLUMN_ID
+                + " = \"" + question.getId() + "\"", null);
+        Map<String, Turninformation> turninformation = question.getTurninformation();
+        for (Map.Entry<String, Turninformation> turninfo : turninformation.entrySet()) {
+            deleteTurnInformation(turninfo);
+        }
+    }
+
+    private List<Question> getAllQuestionsForRoundId(String id) {
+        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_QUESTIONS + " WHERE "
+                + MySQLiteHelper.QUESTIONS_COLUMN_ROUND + " = \"" + id + "\"";
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        List<Question> questions = new ArrayList<Question>();
+        if (cursor.moveToFirst()) {
+            do {
+                Question question = cursorToQuestion(cursor);
+                question.setTurninformation(getAllTurninformationForQuestionID(question.getId()));
+                questions.add(question);
+            } while (cursor.moveToNext());
+        }
+        return questions;
+    }
+
+    public Question updateQuestion(Question question) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ID, question.getId());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.getText());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.getAnswerLat());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.getAnswerLong());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.getState());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.getParticipantWhoWon());
+        database.update(MySQLiteHelper.TABLE_QUESTIONS, values, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = \"" + question.getId() + "\"", null);
+        Map<String, Turninformation> turninformation = question.getTurninformation();
+        for (Map.Entry<String, Turninformation> turninfo : turninformation.entrySet()) {
+            createTurninformation(turninfo.getValue(), question.getId(), turninfo.getKey());
+        }
+        return question;
+    }
+
+    private Question cursorToQuestion(Cursor cursor) {
+        Question question = new Question();
+        question.setId(cursor.getString(0));
+        question.setText(cursor.getString(1));
+        question.setAnswerLat(cursor.getFloat(3));
+        question.setAnswerLong(cursor.getFloat(4));
+        question.setState(cursor.getInt(5));
+        question.setParticipantWhoWon(cursor.getString(6));
+        return question;
+    }
+
+    private Turninformation createTurninformation(Turninformation turninformation, String questionId, String participantId) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_ID, turninformation.getId());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_QUESTION, questionId);
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_PARTICIPANT, participantId);
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_LAT, turninformation.getAnswerLat());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_LONG, turninformation.getAnswerLong());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_DISTANCE, turninformation.getDistance());
+        database.insert(MySQLiteHelper.TABLE_TURNINFORMATION, null, values);
+        return turninformation;
+    }
+
+    private void deleteTurnInformation(Map.Entry<String, Turninformation> turninfo) {
+        database.delete(MySQLiteHelper.TABLE_TURNINFORMATION, MySQLiteHelper.TURNINFORMATION_COLUMN_ID
+                + " = \"" + turninfo.getValue().getId() + "\"", null);
+    }
+
+    private HashMap<String, Turninformation> getAllTurninformationForQuestionID(String id) {
+        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_TURNINFORMATION + " WHERE "
+                + MySQLiteHelper.TURNINFORMATION_COLUMN_QUESTION + " = \"" + id + "\"";
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        HashMap<String, Turninformation> turninformation = new HashMap<>();
+        if (cursor.moveToFirst()) {
+            do {
+                Turninformation info = cursorToTurninformation(cursor);
+                turninformation.put(cursor.getString(2), info);
+            } while (cursor.moveToNext());
+        }
+        return turninformation;
+    }
+
+    public Turninformation updateTurninformation(Turninformation turninformation, String questionId, String participantId) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_ID, turninformation.getId());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_QUESTION, questionId);
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_PARTICIPANT, participantId);
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_LAT, turninformation.getAnswerLat());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_LONG, turninformation.getAnswerLong());
+        values.put(MySQLiteHelper.TURNINFORMATION_COLUMN_DISTANCE, turninformation.getDistance());
+        database.update(MySQLiteHelper.TABLE_TURNINFORMATION, values, MySQLiteHelper.TURNINFORMATION_COLUMN_ID + " = \"" + turninformation.getId() + "\"", null);
+        return turninformation;
+    }
+
+    private Turninformation cursorToTurninformation(Cursor cursor) {
+        Turninformation turninformation = new Turninformation();
+        turninformation.setId(cursor.getString(0));
+        turninformation.setAnswerLat(cursor.getFloat(3));
+        turninformation.setAnswerLong(cursor.getFloat(4));
+        turninformation.setDistance(cursor.getFloat(5));
+        return turninformation;
     }
 
     public void dropAllTables() {

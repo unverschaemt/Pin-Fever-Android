@@ -8,22 +8,22 @@ import java.util.List;
  * Created by D060338 on 05.05.2015.
  */
 public class Game implements Serializable {
-    private long id;
+    private String id;
     private List<Round> rounds;
     private GameState state;
     private Round activeRound;
     private List<Participant> participants;
-    private long activeRoundID;
+    private String activeRoundID;
 
     public Game() {
 
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setID(long id) {
+    public void setID(String id) {
         this.id = id;
     }
 
@@ -75,11 +75,11 @@ public class Game implements Serializable {
         this.participants = participants;
     }
 
-    public void setActiveRoundID(long id) {
+    public void setActiveRoundID(String id) {
         this.activeRoundID = id;
     }
 
-    public long getActiveRoundID() {
+    public String getActiveRoundID() {
         return this.activeRoundID;
     }
 }

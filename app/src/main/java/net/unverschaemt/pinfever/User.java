@@ -11,7 +11,6 @@ public class User implements Serializable {
 
     private String userName;
     private String id;
-    private String name;
     private String email;
     private int score;
     private Bitmap avatar;
@@ -35,14 +34,6 @@ public class User implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {

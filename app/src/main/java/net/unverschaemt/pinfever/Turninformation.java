@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Turninformation implements Serializable {
 
-    private long id;
+    private String id;
     private float answerLat;
     private float answerLong;
     private float distance;
@@ -16,11 +16,11 @@ public class Turninformation implements Serializable {
 
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

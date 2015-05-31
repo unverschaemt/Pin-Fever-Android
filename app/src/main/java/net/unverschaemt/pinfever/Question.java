@@ -1,7 +1,8 @@
 package net.unverschaemt.pinfever;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.*;
+import java.util.Map;
 
 /**
  * Created by D060338 on 05.05.2015.
@@ -10,13 +11,13 @@ public class Question implements Serializable {
     private int ownScore = 0;
     private int opponentScore = 0;
 
-    private long id;
+    private String id;
     private String text;
     private float answerLat;
     private float answerLong;
     private int state;
-    private long participantWhoWon;
-    private java.util.Map<Long, Turninformation> turnInformation;
+    private String participantWhoWon;
+    private java.util.Map<String, Turninformation> turnInformation;
 
     public Question() {
 
@@ -30,11 +31,11 @@ public class Question implements Serializable {
         return opponentScore;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -70,23 +71,23 @@ public class Question implements Serializable {
         this.state = state;
     }
 
-    public long getParticipantWhoWon() {
+    public String getParticipantWhoWon() {
         return participantWhoWon;
     }
 
-    public void setParticipantWhoWon(long participantWhoWon) {
+    public void setParticipantWhoWon(String participantWhoWon) {
         this.participantWhoWon = participantWhoWon;
     }
 
-    public void setTurninformation(java.util.Map<Long, Turninformation> turnInformation) {
+    public void setTurninformation(Map<String, Turninformation> turnInformation) {
         this.turnInformation = turnInformation;
     }
 
-    public void addTurninformation(Long user, Turninformation turninformation) {
+    public void addTurninformation(String user, Turninformation turninformation) {
         this.turnInformation.put(user, turninformation);
     }
 
-    public java.util.Map<Long, Turninformation> getTurninformation() {
+    public Map<String, Turninformation> getTurninformation() {
         return turnInformation;
     }
 }

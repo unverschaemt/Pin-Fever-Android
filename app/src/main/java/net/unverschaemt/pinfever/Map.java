@@ -133,7 +133,7 @@ public class Map extends Activity {
     private void showGuessesAndAnswer() {
         GeoPoint answerPoint = new GeoPoint(question.getAnswerLat(), question.getAnswerLong());
         addMarker(answerPoint);
-        for (java.util.Map.Entry<Long, Turninformation> turninfo : question.getTurninformation().entrySet()) {
+        for (java.util.Map.Entry<String, Turninformation> turninfo : question.getTurninformation().entrySet()) {
             GeoPoint guessPoint = showGuess(turninfo.getValue());
             PathOverlay myPath = new PathOverlay(Color.RED, this);
             myPath.addPoint(answerPoint);
