@@ -115,7 +115,9 @@ public class DataSource {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.GAMES_COLUMN_ID, game.getId());
         values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
-        values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
+        if (game.getActiveRound() != null) {
+            values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
+        }
         database.insert(MySQLiteHelper.TABLE_GAMES, null, values);
         List<Round> rounds = game.getRounds();
         if (rounds != null) {
@@ -214,7 +216,7 @@ public class DataSource {
 
     private Game cursorToGame(Cursor cursor) {
         Game game = new Game();
-        game.setID(cursor.getString(0));
+        game.setId(cursor.getString(0));
         game.setState(GameState.values()[cursor.getInt(1)]);
         game.setActiveRoundID(cursor.getString(2));
         return game;

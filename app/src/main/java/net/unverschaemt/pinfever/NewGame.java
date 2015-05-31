@@ -1,7 +1,6 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,6 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.tokenautocomplete.TokenCompleteTextView;
@@ -28,7 +30,9 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     ArrayAdapter<User> adapter;
     private UserAutoCompleteView completionView;
     private ServerAPI serverAPI;
+    private DataSource dataSource;
     private ProgressBar busyIndicator;
+    private List<User> userToPlayGameWith = new ArrayList<User>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         completionView.setTokenListener(this);
         completionView.setTokenLimit(numberOfFriendsToPlayWith);
         serverAPI = new ServerAPI(this);
+        dataSource = new DataSource(this);
         fillGridLayout();
     }
 
@@ -112,6 +117,8 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     public void onTokenAdded(Object o) {
         View popup = findViewById(R.id.NewGame_popup);
         popup.setVisibility(View.VISIBLE);
+        userToPlayGameWith.add((User) o);
+
     }
 
     @Override
@@ -120,15 +127,85 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         if (completionView.getObjects().size() == 0) {
             popup.setVisibility(View.GONE);
         }
+        userToPlayGameWith.remove((User) o);
     }
 
     public void start(View view) {
         busyIndicator.setVisibility(View.VISIBLE);
+        if (userToPlayGameWith.contains(getRandomUser())) {
+            startAutoMatch();
+        } else {
+            startNewGame();
+        }
+    }
+
+    private void startNewGame() {
+        JsonObject jsonParam = new JsonObject();
+        JsonArray participants = new JsonArray();
+        Gson gson = new Gson();
+        for (User participant : userToPlayGameWith) {
+            participants.add(gson.fromJson(participant.getId(), JsonElement.class));
+        }
+        jsonParam.add(ServerAPI.participants, participants);
+        serverAPI.connect(ServerAPI.urlCreateGame, "", jsonParam, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+                busyIndicator.setVisibility(View.GONE);
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+                    Game game = createGameOfResponse(data);
+                }
+            }
+        });
+    }
+
+    private Game createGameOfResponse(JsonObject data) {
+        JsonObject turnbasedMatch = data.getAsJsonObject(ServerAPI.turnbasedMatchObject);
+        Game game = new Game();
+        String a = turnbasedMatch.get(ServerAPI.id).getAsString();
+        game.setId(a);
+        game.setRounds(getRounds(turnbasedMatch));
+        game.setParticipants(getParticipants(turnbasedMatch));
+        game.setState(GameState.valueOf(turnbasedMatch.get(ServerAPI.status).getAsString()));
+        //dataSource.createGame(game);
+        return game;
+    }
+
+    private List<Participant> getParticipants(JsonObject autoGame) {
+        List<Participant> participants = new ArrayList<Participant>();
+        JsonArray participantsJSON = autoGame.getAsJsonArray(ServerAPI.participants);
+        for (JsonElement participantJSON : participantsJSON) {
+            Participant participant = new Participant();
+            participant.setId(participantJSON.getAsString());
+            participants.add(participant);
+        }
+        return participants;
+    }
+
+    private List<Round> getRounds(JsonObject autoGame) {
+        List<Round> rounds = new ArrayList<Round>();
+        JsonArray roundsJSON = autoGame.getAsJsonArray(ServerAPI.rounds);
+        for (JsonElement roundJSON : roundsJSON) {
+            Round round = new Round();
+            round.setId(roundJSON.getAsString());
+            rounds.add(round);
+        }
+        return rounds;
+    }
+
+    private void startAutoMatch() {
         JsonObject jsonParam = new JsonObject();
         serverAPI.connect(ServerAPI.urlFindAutoGame, "", jsonParam, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
                 busyIndicator.setVisibility(View.GONE);
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
+                    JsonObject autoGame = data.getAsJsonObject(ServerAPI.autoGameObject);
+                    //TODO: save id, if WAIT_FOR_PLAYERS, else create Game with matchID
+                }
             }
         });
     }

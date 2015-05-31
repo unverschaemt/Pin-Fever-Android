@@ -24,6 +24,8 @@ public class ServerAPI {
     public final static String errorInfo = "info";
     public final static String dataObject = "data";
     public final static String playerObject = "player";
+    public final static String autoGameObject = "autoGame";
+    public final static String turnbasedMatchObject = "TurnBasedMatch";
     public final static String friends = "friends";
     public final static String players = "players";
     public final static String id = "_id";
@@ -31,6 +33,12 @@ public class ServerAPI {
     public final static String level = "level";
     public final static String avatar = "avatar";
     public final static String token = "token";
+    public final static String state = "state";
+    public final static String status = "status";
+    public final static String mode = "mode";
+    public final static String participants = "participants";
+    public final static String matchId = "matchId";
+    public final static String rounds = "turns";
 
     public final static String paramAuthToken = "api-auth-token";
     public final static String paramEmail = "email";
@@ -47,7 +55,9 @@ public class ServerAPI {
     public final static String urlSetPlayer = "/players/me/set";
     public final static String urlUploadAvatar = "/players/me/avatarupload";
     public final static String urlGetPlayerMe = "me";
-    public final static String urlFindAutoGame = "/turnbasedmatches/findauto";
+    public final static String urlFindAutoGame = "/turnbasedmatch/findauto";
+    public final static String urlCreateGame = "/turnbasedmatch/create";
+    public final static String urlGetGame = "/turnbasedmatch/";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
@@ -70,6 +80,10 @@ public class ServerAPI {
         contentTypes.put(urlUploadAvatar, ContentType.FORM_DATA);
         requestMethods.put(urlFindAutoGame, RequestMethod.POST);
         contentTypes.put(urlFindAutoGame, ContentType.JSON);
+        requestMethods.put(urlCreateGame, RequestMethod.POST);
+        contentTypes.put(urlCreateGame, ContentType.JSON);
+        requestMethods.put(urlGetGame, RequestMethod.GET);
+
 
         StrictMode.ThreadPolicy policy = new StrictMode.
                 ThreadPolicy.Builder().permitAll().build();

@@ -61,7 +61,7 @@ public class Map extends Activity {
         resetQuestionText();
         initializeMap();
 
-        if (gameState == GameState.ACTIVE) {
+        if (gameState == GameState.MATCH_ACTIVE) {
             setMapTouchable();
         } else {
             Button submitButton = (Button) findViewById(R.id.Map_submit);
@@ -80,7 +80,7 @@ public class Map extends Activity {
 
     private void resetMap() {
         clearOverlays();
-        if (gameState == GameState.ACTIVE) {
+        if (gameState == GameState.MATCH_ACTIVE) {
             findViewById(R.id.Map_submit).setVisibility(View.GONE);
         } else {
             showGuessesAndAnswer();
@@ -150,7 +150,7 @@ public class Map extends Activity {
     }
 
     public void submitGuess(View view) {
-        if (gameState == GameState.ACTIVE) {
+        if (gameState == GameState.MATCH_ACTIVE) {
             GeoPoint guess = this.guess;
             //TODO: send guess to server
         }
@@ -172,7 +172,7 @@ public class Map extends Activity {
 
     private void clearOverlays() {
         mapView.getOverlays().clear();
-        if (gameState == GameState.ACTIVE) {
+        if (gameState == GameState.MATCH_ACTIVE) {
             mapView.getOverlays().add(new TouchableOverlay(this));
         }
         mapView.invalidate();

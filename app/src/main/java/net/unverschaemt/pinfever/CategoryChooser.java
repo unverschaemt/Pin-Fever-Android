@@ -57,7 +57,7 @@ public class CategoryChooser extends Activity {
                     rounds.add(round);
                     game.setRounds(rounds);
                     game.setActiveRound(round);
-                    game.setState(GameState.ACTIVE);
+                    game.setState(GameState.MATCH_ACTIVE);
                     /*** only for testing ***/
                     Intent intent = new Intent(v.getContext(), Map.class);
                     intent.putExtra(Map.GAME, game);

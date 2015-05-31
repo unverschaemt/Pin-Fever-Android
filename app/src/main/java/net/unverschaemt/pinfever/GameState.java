@@ -4,7 +4,7 @@ package net.unverschaemt.pinfever;
  * Created by D060338 on 25.05.2015.
  */
 public enum GameState {
-    ACTIVE(0),
+    MATCH_ACTIVE(0),
     COMPLETED(1),
     REJECTED(2);
 
