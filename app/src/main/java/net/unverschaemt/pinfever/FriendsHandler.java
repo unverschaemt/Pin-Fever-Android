@@ -21,6 +21,8 @@ public class FriendsHandler {
     private DataSource dataSource;
     private ServerAPI serverAPI;
 
+    int avatarsLoaded = 0;
+
     public FriendsHandler(Context context) {
         this.context = context;
         this.dataSource = new DataSource(context);
@@ -80,19 +82,22 @@ public class FriendsHandler {
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     JsonArray friendsJSON = data.getAsJsonArray(ServerAPI.friends);
+                    avatarsLoaded = 0;
                     for (final JsonElement friend : friendsJSON) {
                         final User newFriend = ServerAPI.convertJSONToUser(friend.getAsJsonObject());
                         loadAvatar(newFriend, new FutureCallback() {
                             @Override
                             public void onCompleted(Exception e, Object result) {
+                                avatarsLoaded++;
                                 newFriend.setAvatar(AvatarHandler.loadAvatarFromStorage(context, newFriend.getId()));
-                                callback.onFriendsLoaded(friends);
+                                if (avatarsLoaded == friends.size()) {
+                                    callback.onFriendsLoaded(friends);
+                                }
                             }
                         });
 
                         friends.add(newFriend);
                     }
-                    callback.onFriendsLoaded(friends);
                     updateFriendsList(friends);
                 } else {
                     callback.onFriendsLoaded(null);

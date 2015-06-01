@@ -12,10 +12,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,6 +25,7 @@ public class FriendsList extends Activity {
     private DataSource dataSource;
     private ProgressBar busyIndicator;
     private FriendsHandler friendsHandler;
+    private BaseAdapter friendsListAdapter;
 
     private ServerAPI serverAPI;
 
@@ -133,8 +134,38 @@ public class FriendsList extends Activity {
     }
 
     public void fillFriendsList(List<User> friends) {
-        this.friends = friends;
-        ListView friendsList = (ListView) findViewById(R.id.FriendsList_friends);
-        friendsList.setAdapter(new FriendListAdapter(this, this.friends));
+        setChangesOfPFriends(friends);
+        removeOldFriends(friends);
+        if (friendsListAdapter == null) {
+            friendsListAdapter = new FriendListAdapter(this, this.friends);
+            ListView friendsList = (ListView) findViewById(R.id.FriendsList_friends);
+            friendsList.setAdapter(friendsListAdapter);
+        } else {
+            friendsListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void removeOldFriends(List<User> friends) {
+        List<User> usersToRemove = new ArrayList<User>();
+        for (User user : this.friends) {
+            if (!friends.contains(user)) {
+                usersToRemove.add(user);
+            }
+        }
+        this.friends.removeAll(usersToRemove);
+    }
+
+    private void setChangesOfPFriends(List<User> friends) {
+        for (User friend : friends) {
+            int index = this.friends.indexOf(friend);
+            if (index > -1) {
+                User oldFriend = this.friends.get(index);
+                if (!oldFriend.getUserName().equals(friend.getUserName()) || !oldFriend.getAvatar().sameAs(friend.getAvatar())) {
+                    this.friends.set(index, friend);
+                }
+            } else {
+                this.friends.add(friend);
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
@@ -26,13 +28,16 @@ import java.util.List;
 public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
 
     final static int numberOfFriendsToPlayWith = 1;
+    final static String RANDOMPLAYER_ID = "random";
 
-    ArrayAdapter<User> adapter;
+    private ArrayAdapter<User> completionViewAdapter;
+    private BaseAdapter gridLayoutAdapter;
     private UserAutoCompleteView completionView;
     private ServerAPI serverAPI;
     private DataSource dataSource;
     private ProgressBar busyIndicator;
     private List<User> userToPlayGameWith = new ArrayList<User>();
+    private List<User> allUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +54,13 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
     }
 
     private void fillGridLayout() {
-        List<User> user = getUser();
+        allUser = getUser();
         GridView layout = (GridView) findViewById(R.id.NewGame_gridLayout);
-        layout.setAdapter(new NewGameGridAdapter(this, user, completionView));
+        gridLayoutAdapter = new NewGameGridAdapter(this, allUser, completionView);
+        layout.setAdapter(gridLayoutAdapter);
 
-        adapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, user);
-        completionView.setAdapter(adapter);
+        completionViewAdapter = new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, allUser);
+        completionView.setAdapter(completionViewAdapter);
 
     }
 
@@ -69,23 +75,47 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         user.addAll(new FriendsHandler(this).getFriends(new FriendsCallback() {
             @Override
             public void onFriendsLoaded(List<User> friends) {
-                List<User> player = new ArrayList<User>();
-                player.add(getRandomUser());
-                player.addAll(friends);
-                GridView layout = (GridView) findViewById(R.id.NewGame_gridLayout);
-                layout.setAdapter(new NewGameGridAdapter(getBaseContext(), player, completionView));
-
-                adapter = new ArrayAdapter<User>(getBaseContext(), android.R.layout.simple_list_item_1, player);
-                completionView.setAdapter(adapter);
+                updatePlayer(friends);
             }
         }));
         return user;
     }
 
+    private void updatePlayer(List<User> friends) {
+        setChangesOfPlayer(friends);
+        removeOldPlayer(friends);
+        gridLayoutAdapter.notifyDataSetChanged();
+        completionViewAdapter.notifyDataSetChanged();
+    }
+
+    private void removeOldPlayer(List<User> friends) {
+        List<User> usersToRemove = new ArrayList<User>();
+        for (User user : allUser) {
+            if (!user.getId().equals(RANDOMPLAYER_ID) && !friends.contains(user)) {
+                usersToRemove.add(user);
+            }
+        }
+        allUser.removeAll(usersToRemove);
+    }
+
+    private void setChangesOfPlayer(List<User> friends) {
+        for (User friend : friends) {
+            int index = allUser.indexOf(friend);
+            if (index > -1) {
+                User oldFriend = allUser.get(index);
+                if (!oldFriend.getUserName().equals(friend.getUserName()) || !oldFriend.getAvatar().sameAs(friend.getAvatar())) {
+                    allUser.set(index, friend);
+                }
+            } else {
+                allUser.add(friend);
+            }
+        }
+    }
+
     private User getRandomUser() {
         User randomUser = new User();
         randomUser.setUserName(getString(R.string.userName_random));
-        randomUser.setId("random");
+        randomUser.setId(RANDOMPLAYER_ID);
         Bitmap randomUserAvatar = BitmapFactory.decodeResource(getResources(), R.mipmap.random_user_avatar);
         randomUser.setAvatar(randomUserAvatar);
         return randomUser;
@@ -155,9 +185,15 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     Game game = createGameOfResponse(data);
+                    goToCategoryChooser();
                 }
             }
         });
+    }
+
+    private void goToCategoryChooser() {
+        Intent intent = new Intent(this, CategoryChooser.class);
+        startActivity(intent);
     }
 
     private Game createGameOfResponse(JsonObject data) {
