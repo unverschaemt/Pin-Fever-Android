@@ -13,10 +13,10 @@ public class User implements Serializable {
     private String id;
     private String email;
     private int score;
-    private Bitmap avatar;
+    private SerialBitmap avatar;
 
     public User() {
-
+        avatar = new SerialBitmap();
     }
 
 
@@ -53,11 +53,11 @@ public class User implements Serializable {
     }
 
     public Bitmap getAvatar() {
-        return avatar;
+        return avatar.bitmap;
     }
 
     public void setAvatar(Bitmap avatar) {
-        this.avatar = avatar;
+        this.avatar.bitmap = avatar;
     }
 
     @Override
