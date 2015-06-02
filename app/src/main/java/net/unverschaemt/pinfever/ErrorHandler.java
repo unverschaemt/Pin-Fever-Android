@@ -16,7 +16,7 @@ public class ErrorHandler {
     public static void showErrorMessage(JsonObject result, Context context) {
         String errorInfo = "";
         String errorMessage = "";
-        errorInfo = result.get(ServerAPI.errorInfo).getAsString();
+        errorInfo = result.get(ServerAPI.errorInfo).toString();
         errorMessage = result.get(ServerAPI.errorObject).getAsString();
         if (errorMessage.equals(errorUnauthorized)) {
             removeToken(context);

@@ -9,19 +9,53 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class CategoryChooser extends Activity {
 
+    public static final int numberOfCategories = 3;
+
+    private ServerAPI serverAPI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_chooser);
 
-        LinearLayout layout = (LinearLayout) findViewById(R.id.Category_layout);
-        List<String> categories = getCategories();
+        serverAPI = new ServerAPI(this);
+        setCategories();
+    }
+
+    private void setCategories() {
+        serverAPI.connect(ServerAPI.urlGetCategories, ServerAPI.paramAmountOfCategories + numberOfCategories, null, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    List<String> categories = new ArrayList<String>();
+                    JsonObject data = ((JsonObject) result).getAsJsonObject(ServerAPI.dataObject);
+                    JsonArray categoriesJSON = data.getAsJsonArray(ServerAPI.categoriesObject);
+                    for (JsonElement categoryJSON : categoriesJSON) {
+                        categories.add(((JsonObject) categoryJSON).get(ServerAPI.categoryName).getAsString());
+                    }
+                    if (categories.size() > 0) {
+                        buildUI(categories);
+                    }
+                } else {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                }
+            }
+        });
+    }
+
+    private void buildUI(List<String> categories) {
         float buttonHeight = 100 / categories.size();
         for (String category : categories) {
             Button button = new Button(this);
@@ -64,16 +98,9 @@ public class CategoryChooser extends Activity {
                     startActivity(intent);
                 }
             });
+            LinearLayout layout = (LinearLayout) findViewById(R.id.Category_layout);
             layout.addView(button);
         }
-    }
-
-    private List<String> getCategories() {
-        List<String> categories = new ArrayList<String>();
-        categories.add("Sport");
-        categories.add("Sex");
-        categories.add("Education");
-        return categories;
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -26,6 +25,7 @@ public class ServerAPI {
     public final static String playerObject = "player";
     public final static String autoGameObject = "autoGame";
     public final static String turnbasedMatchObject = "TurnBasedMatch";
+    public final static String categoriesObject = "categories";
     public final static String friends = "friends";
     public final static String players = "players";
     public final static String id = "_id";
@@ -39,12 +39,14 @@ public class ServerAPI {
     public final static String participants = "participants";
     public final static String matchId = "matchId";
     public final static String rounds = "turns";
+    public final static String categoryName = "name";
 
     public final static String paramAuthToken = "api-auth-token";
     public final static String paramEmail = "email";
     public final static String paramPassword = "password";
     public final static String paramDisplayName = "displayName";
     public final static String paramPlayerId = "playerId";
+    public final static String paramAmountOfCategories = "?amount=";
 
     public final static String urlLogin = "/auth/login";
     public final static String urlRegister = "/auth/register";
@@ -58,6 +60,8 @@ public class ServerAPI {
     public final static String urlFindAutoGame = "/turnbasedmatch/findauto";
     public final static String urlCreateGame = "/turnbasedmatch/create";
     public final static String urlGetGame = "/turnbasedmatch/";
+    public final static String urlGetCategories = "/question/randomcategories";
+    public final static String urlAddToDatabase = "/question/add";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
@@ -83,6 +87,9 @@ public class ServerAPI {
         requestMethods.put(urlCreateGame, RequestMethod.POST);
         contentTypes.put(urlCreateGame, ContentType.JSON);
         requestMethods.put(urlGetGame, RequestMethod.GET);
+        requestMethods.put(urlGetCategories, RequestMethod.GET);
+        requestMethods.put(urlAddToDatabase, RequestMethod.POST);
+        contentTypes.put(urlAddToDatabase, ContentType.JSON);
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.
