@@ -33,7 +33,8 @@ public class CategoryChooser extends Activity {
     }
 
     private void setCategories() {
-        String lang = "en";
+        String lang = Locale.getDefault().getLanguage();
+        ;
         serverAPI.connect(ServerAPI.urlGetCategories, "?" + ServerAPI.paramAmountOfCategories + NUMBER_OF_CATEGORIES + "&" + ServerAPI.paramLanguage + lang, null, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
@@ -78,9 +79,9 @@ public class CategoryChooser extends Activity {
     }
 
     private void startNewGame(String categoryId) {
-        String language = "en";
+        String lang = Locale.getDefault().getLanguage();
         serverAPI.connect(ServerAPI.urlGetQuestions, "?" + ServerAPI.paramAmountOfQuestions + NUMBER_OF_QUESTIONS + "&" +
-                ServerAPI.paramLanguage + language + "&" +
+                ServerAPI.paramLanguage + lang + "&" +
                 ServerAPI.paramCategory + categoryId, null, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
