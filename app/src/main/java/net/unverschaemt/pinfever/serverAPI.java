@@ -46,7 +46,10 @@ public class ServerAPI {
     public final static String paramPassword = "password";
     public final static String paramDisplayName = "displayName";
     public final static String paramPlayerId = "playerId";
-    public final static String paramAmountOfCategories = "?amount=";
+    public final static String paramAmountOfCategories = "amount=";
+    public final static String paramAmountOfQuestions = "amount=";
+    public final static String paramLanguage = "language=";
+    public final static String paramCategory = "category=";
 
     public final static String urlLogin = "/auth/login";
     public final static String urlRegister = "/auth/register";
@@ -61,6 +64,7 @@ public class ServerAPI {
     public final static String urlCreateGame = "/turnbasedmatch/create";
     public final static String urlGetGame = "/turnbasedmatch/";
     public final static String urlGetCategories = "/question/randomcategories";
+    public final static String urlGetQuestions = "/question/random";
     public final static String urlAddToDatabase = "/question/add";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
@@ -90,6 +94,7 @@ public class ServerAPI {
         requestMethods.put(urlGetCategories, RequestMethod.GET);
         requestMethods.put(urlAddToDatabase, RequestMethod.POST);
         contentTypes.put(urlAddToDatabase, ContentType.JSON);
+        requestMethods.put(urlGetQuestions, RequestMethod.GET);
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.

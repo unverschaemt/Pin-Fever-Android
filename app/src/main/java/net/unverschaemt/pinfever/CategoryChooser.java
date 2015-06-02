@@ -1,7 +1,6 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,13 +13,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class CategoryChooser extends Activity {
 
-    public static final int numberOfCategories = 3;
+    public static final int NUMBER_OF_CATEGORIES = 3;
+    public static final int NUMBER_OF_QUESTIONS = 3;
 
     private ServerAPI serverAPI;
 
@@ -34,16 +33,18 @@ public class CategoryChooser extends Activity {
     }
 
     private void setCategories() {
-        serverAPI.connect(ServerAPI.urlGetCategories, ServerAPI.paramAmountOfCategories + numberOfCategories, null, new FutureCallback() {
+        String lang = "en";
+        serverAPI.connect(ServerAPI.urlGetCategories, "?" + ServerAPI.paramAmountOfCategories + NUMBER_OF_CATEGORIES + "&" + ServerAPI.paramLanguage + lang, null, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
                 JsonObject jsonObject = (JsonObject) result;
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
-                    List<String> categories = new ArrayList<String>();
+                    java.util.Map<String, String> categories = new HashMap<String, String>();
                     JsonObject data = ((JsonObject) result).getAsJsonObject(ServerAPI.dataObject);
                     JsonArray categoriesJSON = data.getAsJsonArray(ServerAPI.categoriesObject);
                     for (JsonElement categoryJSON : categoriesJSON) {
-                        categories.add(((JsonObject) categoryJSON).get(ServerAPI.categoryName).getAsString());
+                        JsonObject categoryObject = (JsonObject) categoryJSON;
+                        categories.put(categoryObject.get(ServerAPI.categoryName).getAsString(), categoryObject.get(ServerAPI.id).getAsString());
                     }
                     if (categories.size() > 0) {
                         buildUI(categories);
@@ -55,11 +56,11 @@ public class CategoryChooser extends Activity {
         });
     }
 
-    private void buildUI(List<String> categories) {
+    private void buildUI(final java.util.Map<String, String> categories) {
         float buttonHeight = 100 / categories.size();
-        for (String category : categories) {
+        for (java.util.Map.Entry<String, String> category : categories.entrySet()) {
             Button button = new Button(this);
-            button.setText(category);
+            button.setText(category.getKey());
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT, buttonHeight);
@@ -67,40 +68,25 @@ public class CategoryChooser extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*** only for testing ***/
-                    Game game = new Game();
-                    List<Round> rounds = new ArrayList<Round>();
-                    Round round = new Round();
-                    List<Question> questions = new ArrayList<Question>();
-                    Question question = new Question();
-                    question.setAnswerLat((long) 52.9384);
-                    question.setAnswerLong((long) 07.9384);
-                    question.setText("Where is my mom?");
-                    questions.add(question);
-                    question = new Question();
-                    question.setAnswerLat((long) 32.9384);
-                    question.setAnswerLong((long) 02.9384);
-                    question.setText("Where is your mother fucker?");
-                    questions.add(question);
-                    round.setQuestions(questions);
-                    question = new Question();
-                    question.setAnswerLat((long) 42.9384);
-                    question.setAnswerLong((long) 11.9384);
-                    question.setText("Where is everybody?");
-                    questions.add(question);
-                    rounds.add(round);
-                    game.setRounds(rounds);
-                    game.setActiveRound(round);
-                    game.setState(GameState.MATCH_ACTIVE);
-                    /*** only for testing ***/
-                    Intent intent = new Intent(v.getContext(), Map.class);
-                    intent.putExtra(Map.GAME, game);
-                    startActivity(intent);
+                    Button buttonClicked = (Button) v;
+                    startNewGame(categories.get(buttonClicked.getText().toString()));
                 }
             });
             LinearLayout layout = (LinearLayout) findViewById(R.id.Category_layout);
             layout.addView(button);
         }
+    }
+
+    private void startNewGame(String categoryId) {
+        String language = "en";
+        serverAPI.connect(ServerAPI.urlGetQuestions, "?" + ServerAPI.paramAmountOfQuestions + NUMBER_OF_QUESTIONS + "&" +
+                ServerAPI.paramLanguage + language + "&" +
+                ServerAPI.paramCategory + categoryId, null, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+
+            }
+        });
     }
 
     @Override
