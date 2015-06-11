@@ -15,12 +15,21 @@ public class Question implements Serializable {
     private String text;
     private float answerLat;
     private float answerLong;
+    private String answerText;
     private int state;
     private String participantWhoWon;
     private java.util.Map<String, Turninformation> turnInformation;
 
     public Question() {
 
+    }
+    
+    public String getAnswerText() {
+        return answerText;
+    }
+
+    public void setAnswerText(String answerText) {
+        this.answerText = answerText;
     }
 
     public int getOwnScore() {

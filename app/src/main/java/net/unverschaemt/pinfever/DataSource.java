@@ -103,6 +103,21 @@ public class DataSource {
         }
     }
 
+    public User getFriendForId(String id) {
+        String selectQuery = "SELECT  * FROM " + MySQLiteHelper.TABLE_FRIENDS + " WHERE "
+                + MySQLiteHelper.FRIENDS_COLUMN_ID + " = \"" + id + "\"";
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        User friend = null;
+        if (cursor.moveToFirst()) {
+            do {
+                friend = cursorToFriend(cursor);
+            } while (cursor.moveToNext());
+        }
+        return friend;
+    }
+
     private User cursorToFriend(Cursor cursor) {
         User friend = new User();
         friend.setId(cursor.getString(0));
@@ -117,6 +132,8 @@ public class DataSource {
         values.put(MySQLiteHelper.GAMES_COLUMN_STATE, game.getState().getValue());
         if (game.getActiveRound() != null) {
             values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, game.getActiveRound().getId());
+        } else {
+            values.put(MySQLiteHelper.GAMES_COLUMN_ACTIVE_ROUND, "");
         }
         database.insert(MySQLiteHelper.TABLE_GAMES, null, values);
         List<Round> rounds = game.getRounds();
@@ -128,7 +145,7 @@ public class DataSource {
         List<Participant> participants = game.getParticipants();
         if (participants != null) {
             for (Participant participant : participants) {
-                createParticipant(participant);
+                createParticipant(participant, game.getId());
             }
         }
         return game;
@@ -222,9 +239,10 @@ public class DataSource {
         return game;
     }
 
-    public Participant createParticipant(Participant participant) {
+    public Participant createParticipant(Participant participant, String gameId) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_ID, participant.getId());
+        values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_GAME, gameId);
         values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_PLAYER, participant.getPlayer());
         values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_STATE, participant.getState());
         values.put(MySQLiteHelper.PARTICIPANTS_COLUMN_SCORE, participant.getScore());
@@ -314,7 +332,7 @@ public class DataSource {
         List<Question> questions = new ArrayList<Question>();
         if (round.getQuestions() != null) {
             for (Question question : round.getQuestions()) {
-                questions.add(updateQuestion(question));
+                updateQuestion(question);
             }
         }
         round.setQuestions(questions);
@@ -334,6 +352,7 @@ public class DataSource {
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.getText());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.getAnswerLat());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.getAnswerLong());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_TEXT, question.getAnswerText());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.getState());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.getParticipantWhoWon());
         database.insert(MySQLiteHelper.TABLE_QUESTIONS, null, values);
@@ -376,6 +395,7 @@ public class DataSource {
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_TEXT, question.getText());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LAT, question.getAnswerLat());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_LONG, question.getAnswerLong());
+        values.put(MySQLiteHelper.QUESTIONS_COLUMN_ANSWER_TEXT, question.getAnswerText());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_STATE, question.getState());
         values.put(MySQLiteHelper.QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE, question.getParticipantWhoWon());
         database.update(MySQLiteHelper.TABLE_QUESTIONS, values, MySQLiteHelper.QUESTIONS_COLUMN_ID + " = \"" + question.getId() + "\"", null);
@@ -392,8 +412,9 @@ public class DataSource {
         question.setText(cursor.getString(1));
         question.setAnswerLat(cursor.getFloat(3));
         question.setAnswerLong(cursor.getFloat(4));
-        question.setState(cursor.getInt(5));
-        question.setParticipantWhoWon(cursor.getString(6));
+        question.setAnswerText(cursor.getString(5));
+        question.setState(cursor.getInt(6));
+        question.setParticipantWhoWon(cursor.getString(7));
         return question;
     }
 

@@ -1,6 +1,7 @@
 package net.unverschaemt.pinfever;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,19 +23,24 @@ public class CategoryChooser extends Activity {
     public static final int NUMBER_OF_QUESTIONS = 3;
 
     private ServerAPI serverAPI;
+    private Game game;
+    private DataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_chooser);
 
+        game = (Game) getIntent().getSerializableExtra(NewGame.GAME);
+
         serverAPI = new ServerAPI(this);
+        dataSource = new DataSource(this);
         setCategories();
     }
 
     private void setCategories() {
         String lang = Locale.getDefault().getLanguage();
-        ;
+
         serverAPI.connect(ServerAPI.urlGetCategories, "?" + ServerAPI.paramAmountOfCategories + NUMBER_OF_CATEGORIES + "&" + ServerAPI.paramLanguage + lang, null, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
@@ -52,6 +58,7 @@ public class CategoryChooser extends Activity {
                     }
                 } else {
                     ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                    startActivity(new Intent(getBaseContext(), Home.class));
                 }
             }
         });
@@ -78,14 +85,41 @@ public class CategoryChooser extends Activity {
         }
     }
 
-    private void startNewGame(String categoryId) {
+    private void startNewGame(final String categoryId) {
         String lang = Locale.getDefault().getLanguage();
         serverAPI.connect(ServerAPI.urlGetQuestions, "?" + ServerAPI.paramAmountOfQuestions + NUMBER_OF_QUESTIONS + "&" +
                 ServerAPI.paramLanguage + lang + "&" +
                 ServerAPI.paramCategory + categoryId, null, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
-
+                JsonObject jsonObject = (JsonObject) result;
+                if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
+                    List<Question> questions = new ArrayList<Question>();
+                    JsonObject data = ((JsonObject) result).getAsJsonObject(ServerAPI.dataObject);
+                    JsonArray questionsJSON = data.getAsJsonArray(ServerAPI.questions);
+                    for (JsonElement questionJSON : questionsJSON) {
+                        Question question = new Question();
+                        question.setText(((JsonObject) questionJSON).get(ServerAPI.question).getAsString());
+                        JsonObject answerJSON = ((JsonObject) questionJSON).getAsJsonObject(ServerAPI.answerObject);
+                        JsonObject coordinatesJSON = answerJSON.getAsJsonObject(ServerAPI.coordinates);
+                        question.setAnswerLong(coordinatesJSON.get(ServerAPI.longitude).getAsFloat());
+                        question.setAnswerLat(coordinatesJSON.get(ServerAPI.latitude).getAsFloat());
+                        question.setAnswerText(answerJSON.get(ServerAPI.text).getAsString());
+                        questions.add(question);
+                    }
+                    Round activeRound = game.getActiveRound();
+                    activeRound.setQuestions(questions);
+                    activeRound.setCategory(categoryId);
+                    Intent intent = new Intent(getBaseContext(), Map.class);
+                    intent.putExtra(Map.GAME, game);
+                    startActivity(intent);
+                    dataSource.open();
+                    dataSource.createRound(activeRound);
+                    dataSource.close();
+                } else {
+                    ErrorHandler.showErrorMessage(jsonObject, getBaseContext());
+                    startActivity(new Intent(getBaseContext(), Home.class));
+                }
             }
         });
     }

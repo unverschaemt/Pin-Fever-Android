@@ -26,6 +26,7 @@ public class ServerAPI {
     public final static String autoGameObject = "autoGame";
     public final static String turnbasedMatchObject = "TurnBasedMatch";
     public final static String categoriesObject = "categories";
+    public final static String answerObject = "answer";
     public final static String friends = "friends";
     public final static String players = "players";
     public final static String id = "_id";
@@ -40,6 +41,12 @@ public class ServerAPI {
     public final static String matchId = "matchId";
     public final static String rounds = "turns";
     public final static String categoryName = "name";
+    public final static String questions = "questions";
+    public final static String question = "question";
+    public final static String coordinates = "coordinates";
+    public final static String latitude = "latitude";
+    public final static String longitude = "longitude";
+    public final static String text = "text";
 
     public final static String paramAuthToken = "api-auth-token";
     public final static String paramEmail = "email";
@@ -66,6 +73,7 @@ public class ServerAPI {
     public final static String urlGetCategories = "/question/randomcategories";
     public final static String urlGetQuestions = "/question/random";
     public final static String urlAddToDatabase = "/question/add";
+    public final static String urlTakeTurn = "/turnbasedmatch/";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
@@ -95,6 +103,8 @@ public class ServerAPI {
         requestMethods.put(urlAddToDatabase, RequestMethod.POST);
         contentTypes.put(urlAddToDatabase, ContentType.JSON);
         requestMethods.put(urlGetQuestions, RequestMethod.GET);
+        requestMethods.put(urlTakeTurn, RequestMethod.POST);
+        contentTypes.put(urlTakeTurn, ContentType.JSON);
 
 
         StrictMode.ThreadPolicy policy = new StrictMode.

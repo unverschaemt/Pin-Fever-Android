@@ -2,17 +2,19 @@ package net.unverschaemt.pinfever;
 
 import android.provider.Telephony;
 
+import java.io.Serializable;
+
 /**
  * Created by kkoile on 12.05.15.
  */
-public class Participant {
+public class Participant implements Serializable {
 
     private String id;
     private String player;
     private int state;
     private int score;
 
-    public Participant(){
+    public Participant() {
 
     }
 

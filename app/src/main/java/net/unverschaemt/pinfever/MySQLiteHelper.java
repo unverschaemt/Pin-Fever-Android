@@ -27,6 +27,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String QUESTIONS_COLUMN_ROUND = "round";
     public static final String QUESTIONS_COLUMN_ANSWER_LAT = "answerLat";
     public static final String QUESTIONS_COLUMN_ANSWER_LONG = "answerLong";
+    public static final String QUESTIONS_COLUMN_ANSWER_TEXT = "answerText";
     public static final String QUESTIONS_COLUMN_STATE = "state";
     public static final String QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE = "participantWhoWon";
 
@@ -73,6 +74,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + QUESTIONS_COLUMN_ROUND + " text, "
             + QUESTIONS_COLUMN_ANSWER_LAT + " float, "
             + QUESTIONS_COLUMN_ANSWER_LONG + " float, "
+            + QUESTIONS_COLUMN_ANSWER_TEXT + " text, "
             + QUESTIONS_COLUMN_STATE + " integer, "
             + QUESTIONS_COLUMN_PARTICIPANT_WHO_ONE + " text );";
 

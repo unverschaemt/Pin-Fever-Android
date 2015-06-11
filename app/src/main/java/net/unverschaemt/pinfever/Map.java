@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
@@ -27,6 +31,7 @@ import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -43,10 +48,14 @@ public class Map extends Activity {
     private int questionCounter = 0;
     private GameState gameState;
 
+    private ServerAPI serverAPI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        serverAPI = new ServerAPI(this);
 
         game = (Game) getIntent().getSerializableExtra(GAME);
         question = (Question) getIntent().getSerializableExtra(QUESTION);
@@ -150,9 +159,17 @@ public class Map extends Activity {
     }
 
     public void submitGuess(View view) {
+        Turninformation turn = new Turninformation();
         if (gameState == GameState.MATCH_ACTIVE) {
+            java.util.Map<String, Turninformation> turns = question.getTurninformation();
             GeoPoint guess = this.guess;
-            //TODO: send guess to server
+            if (turns == null) {
+                turns = new HashMap<>();
+            }
+            turn.setAnswerLong((float) guess.getLongitude());
+            turn.setAnswerLat((float) guess.getLatitude());
+            turn.setDistance(calcDistance(guess));
+            turns.put(Home.ownUser.getId(), turn);
         }
 
         question = getNextQuestion();
@@ -160,8 +177,40 @@ public class Map extends Activity {
             resetQuestionText();
             resetMap();
         } else {
+            if (gameState == GameState.MATCH_ACTIVE) {
+                sendTurnToServer(turn);
+            }
             startActivity(new Intent(this, Home.class));
         }
+    }
+
+    private void sendTurnToServer(Turninformation turn) {
+        JsonObject jsonParam = new JsonObject();
+        JsonObject turnData = new JsonObject();
+        JsonObject guess = new JsonObject();
+        guess.addProperty("player", Home.ownUser.getId());
+        guess.addProperty("latitude", turn.getAnswerLat());
+        guess.addProperty("longitude", turn.getAnswerLong());
+        guess.addProperty("distance", turn.getDistance());
+        turnData.add("guess", guess);
+        jsonParam.add("turndata", turnData);
+        jsonParam.addProperty("matchcomplete", gameIsComplete());
+        serverAPI.connect(ServerAPI.urlTakeTurn, game.getId() + "/taketurn", jsonParam, new FutureCallback() {
+            @Override
+            public void onCompleted(Exception e, Object result) {
+                String a = "";
+            }
+        });
+    }
+
+    private boolean gameIsComplete() {
+        return false;
+    }
+
+    private float calcDistance(GeoPoint guess) {
+        float[] results = new float[3];
+        Location.distanceBetween(question.getAnswerLong(), question.getAnswerLat(), guess.getLongitude(), guess.getLatitude(), results);
+        return results[0];
     }
 
     private void setGuessMarker(GeoPoint point) {

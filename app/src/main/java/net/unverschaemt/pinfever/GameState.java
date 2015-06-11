@@ -1,9 +1,11 @@
 package net.unverschaemt.pinfever;
 
+import java.io.Serializable;
+
 /**
  * Created by D060338 on 25.05.2015.
  */
-public enum GameState {
+public enum GameState implements Serializable {
     MATCH_ACTIVE(0),
     COMPLETED(1),
     REJECTED(2);

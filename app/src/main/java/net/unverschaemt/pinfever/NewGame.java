@@ -27,8 +27,11 @@ import java.util.List;
 
 public class NewGame extends Activity implements TokenCompleteTextView.TokenListener {
 
+    public final static String GAME = "net.unverschaemt.PinFever.GAME";
+
     final static int numberOfFriendsToPlayWith = 1;
     final static String RANDOMPLAYER_ID = "random";
+    final static int NUMBER_OF_ROUNDS = 3;
 
     private ArrayAdapter<User> completionViewAdapter;
     private BaseAdapter gridLayoutAdapter;
@@ -171,12 +174,12 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
 
     private void startNewGame() {
         JsonObject jsonParam = new JsonObject();
-        JsonArray participants = new JsonArray();
+        JsonArray participantsJSON = new JsonArray();
         Gson gson = new Gson();
         for (User participant : userToPlayGameWith) {
-            participants.add(gson.fromJson(participant.getId(), JsonElement.class));
+            participantsJSON.add(gson.fromJson(participant.getId(), JsonElement.class));
         }
-        jsonParam.add(ServerAPI.participants, participants);
+        jsonParam.add(ServerAPI.participants, participantsJSON);
         serverAPI.connect(ServerAPI.urlCreateGame, "", jsonParam, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
@@ -185,15 +188,17 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
                 if (jsonObject.get(ServerAPI.errorObject).isJsonNull()) {
                     JsonObject data = jsonObject.getAsJsonObject(ServerAPI.dataObject);
                     Game game = createGameOfResponse(data);
-                    goToCategoryChooser();
+                    goToCategoryChooser(game);
                 }
             }
         });
     }
 
-    private void goToCategoryChooser() {
+    private void goToCategoryChooser(Game game) {
         Intent intent = new Intent(this, CategoryChooser.class);
+        intent.putExtra(GAME, game);
         startActivity(intent);
+        finish();
     }
 
     private Game createGameOfResponse(JsonObject data) {
@@ -204,7 +209,19 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         game.setRounds(getRounds(turnbasedMatch));
         game.setParticipants(getParticipants(turnbasedMatch));
         game.setState(GameState.valueOf(turnbasedMatch.get(ServerAPI.status).getAsString()));
-        //dataSource.createGame(game);
+        List<Round> rounds = new ArrayList<Round>();
+        for (int i = 0; i < NUMBER_OF_ROUNDS; i++) {
+            Round round = new Round();
+            round.setId(game.getId() + i);
+            if (i == 0) {
+                game.setActiveRound(round);
+            }
+            rounds.add(round);
+        }
+        game.setRounds(rounds);
+        dataSource.open();
+        dataSource.createGame(game);
+        dataSource.close();
         return game;
     }
 
@@ -214,6 +231,7 @@ public class NewGame extends Activity implements TokenCompleteTextView.TokenList
         for (JsonElement participantJSON : participantsJSON) {
             Participant participant = new Participant();
             participant.setId(participantJSON.getAsString());
+            participant.setPlayer(participantJSON.getAsString());
             participants.add(participant);
         }
         return participants;

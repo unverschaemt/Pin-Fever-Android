@@ -85,6 +85,10 @@ public class GameListAdapter extends BaseAdapter {
     }
 
     private User getUserFromId(String id) {
-        return null;
+        DataSource dataSource = new DataSource(context);
+        dataSource.open();
+        User user = dataSource.getFriendForId(id);
+        dataSource.close();
+        return user;
     }
 }
