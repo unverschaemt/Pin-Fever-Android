@@ -21,6 +21,7 @@ import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
@@ -38,6 +39,8 @@ import java.util.List;
 public class Map extends Activity {
     public final static String GAME = "net.unverschaemt.pinfever.GAME";
     public final static String QUESTION = "net.unverschaemt.pinfever.QUESTION";
+
+    private final static int ZOOMLEVEL = 2;
 
     private Game game = null;
     private Question question = null;
@@ -73,9 +76,8 @@ public class Map extends Activity {
         if (gameState == GameState.MATCH_ACTIVE) {
             setMapTouchable();
         } else {
-            Button submitButton = (Button) findViewById(R.id.Map_submit);
-            submitButton.setText("Next");
-            submitButton.setVisibility(View.VISIBLE);
+            Button okayButton = (Button) findViewById(R.id.Map_nextButton);
+            okayButton.setVisibility(View.VISIBLE);
             showGuessesAndAnswer();
         }
     }
@@ -89,11 +91,9 @@ public class Map extends Activity {
 
     private void resetMap() {
         clearOverlays();
-        if (gameState == GameState.MATCH_ACTIVE) {
-            findViewById(R.id.Map_submit).setVisibility(View.GONE);
-        } else {
-            showGuessesAndAnswer();
-        }
+        mapView.getController().setZoom(ZOOMLEVEL);
+        findViewById(R.id.Map_submit).setVisibility(View.GONE);
+        findViewById(R.id.Map_nextButton).setVisibility(View.GONE);
     }
 
     private void initializeMap() {
@@ -102,7 +102,7 @@ public class Map extends Activity {
         mapView.setMultiTouchControls(true);
         mapView.setMinZoomLevel(2);
         mapView.setClickable(true);
-        mapView.getController().setZoom(2);
+        mapView.getController().setZoom(ZOOMLEVEL);
         final MapTileProviderBasic tileProvider = new MapTileProviderBasic(getApplicationContext());
         final ITileSource tileSource = new XYTileSource("watercolor", null, 2, 17,
                 256, ".jpg", new String[]{"http://tile.stamen.com/watercolor/"});
@@ -142,14 +142,19 @@ public class Map extends Activity {
     private void showGuessesAndAnswer() {
         GeoPoint answerPoint = new GeoPoint(question.getAnswerLat(), question.getAnswerLong());
         addMarker(answerPoint);
+        ArrayList<GeoPoint> points = new ArrayList<>();
+        points.add(answerPoint);
         for (java.util.Map.Entry<String, Turninformation> turninfo : question.getTurninformation().entrySet()) {
             GeoPoint guessPoint = showGuess(turninfo.getValue());
             PathOverlay myPath = new PathOverlay(Color.RED, this);
             myPath.addPoint(answerPoint);
             myPath.addPoint(guessPoint);
             mapView.getOverlays().add(myPath);
+            points.add(guessPoint);
         }
         mapView.invalidate();
+        BoundingBoxE6 box = BoundingBoxE6.fromGeoPoints(points);
+        mapView.zoomToBoundingBox(box);
     }
 
     private GeoPoint showGuess(Turninformation turnInformation) {
@@ -160,27 +165,27 @@ public class Map extends Activity {
 
     public void submitGuess(View view) {
         Turninformation turn = new Turninformation();
-        if (gameState == GameState.MATCH_ACTIVE) {
-            java.util.Map<String, Turninformation> turns = question.getTurninformation();
-            GeoPoint guess = this.guess;
-            if (turns == null) {
-                turns = new HashMap<>();
-            }
-            turn.setAnswerLong((float) guess.getLongitude());
-            turn.setAnswerLat((float) guess.getLatitude());
-            turn.setDistance(calcDistance(guess));
-            turns.put(Home.ownUser.getId(), turn);
-        }
+        java.util.Map<String, Turninformation> turns = question.getTurninformation();
+        GeoPoint guess = this.guess;
+        turn.setAnswerLong((float) guess.getLongitude());
+        turn.setAnswerLat((float) guess.getLatitude());
+        turn.setDistance(calcDistance(guess));
+        question.addTurninformation(Home.ownUser.getId(), turn);
 
+        sendTurnToServer(turn);
+        findViewById(R.id.Map_submit).setVisibility(View.GONE);
+        findViewById(R.id.Map_nextButton).setVisibility(View.VISIBLE);
+        showGuessesAndAnswer();
+    }
+
+    public void nextQuestion(View view) {
         question = getNextQuestion();
         if (question != null) {
             resetQuestionText();
             resetMap();
         } else {
-            if (gameState == GameState.MATCH_ACTIVE) {
-                sendTurnToServer(turn);
-            }
             startActivity(new Intent(this, Home.class));
+            finish();
         }
     }
 
@@ -188,14 +193,14 @@ public class Map extends Activity {
         JsonObject jsonParam = new JsonObject();
         JsonObject turnData = new JsonObject();
         JsonObject guess = new JsonObject();
-        guess.addProperty("player", Home.ownUser.getId());
-        guess.addProperty("latitude", turn.getAnswerLat());
-        guess.addProperty("longitude", turn.getAnswerLong());
-        guess.addProperty("distance", turn.getDistance());
-        turnData.add("guess", guess);
-        jsonParam.add("turndata", turnData);
-        jsonParam.addProperty("matchcomplete", gameIsComplete());
-        serverAPI.connect(ServerAPI.urlTakeTurn, game.getId() + "/taketurn", jsonParam, new FutureCallback() {
+        guess.addProperty(ServerAPI.player, Home.ownUser.getId());
+        guess.addProperty(ServerAPI.latitude, turn.getAnswerLat());
+        guess.addProperty(ServerAPI.longitude, turn.getAnswerLong());
+        guess.addProperty(ServerAPI.distance, turn.getDistance());
+        turnData.add(ServerAPI.guess, guess);
+        jsonParam.add(ServerAPI.turnDataObject, turnData);
+        jsonParam.addProperty(ServerAPI.matchcomplete, gameIsComplete());
+        serverAPI.connect(ServerAPI.urlGetGame, game.getId() + ServerAPI.urlTakeTurn, jsonParam, new FutureCallback() {
             @Override
             public void onCompleted(Exception e, Object result) {
                 String a = "";

@@ -38,6 +38,7 @@ public class ServerAPI {
     public final static String status = "status";
     public final static String mode = "mode";
     public final static String participants = "participants";
+    public final static String player = "player";
     public final static String matchId = "matchId";
     public final static String rounds = "turns";
     public final static String categoryName = "name";
@@ -46,6 +47,10 @@ public class ServerAPI {
     public final static String coordinates = "coordinates";
     public final static String latitude = "latitude";
     public final static String longitude = "longitude";
+    public final static String distance = "distance";
+    public final static String guess = "guess";
+    public final static String turnDataObject = "turnData";
+    public final static String matchcomplete = "matchcomplete";
     public final static String text = "text";
 
     public final static String paramAuthToken = "api-auth-token";
@@ -73,7 +78,7 @@ public class ServerAPI {
     public final static String urlGetCategories = "/question/randomcategories";
     public final static String urlGetQuestions = "/question/random";
     public final static String urlAddToDatabase = "/question/add";
-    public final static String urlTakeTurn = "/turnbasedmatch/";
+    public final static String urlTakeTurn = "/taketurn";
 
     private java.util.Map<String, RequestMethod> requestMethods = new HashMap<String, RequestMethod>();
     private java.util.Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();

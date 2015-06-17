@@ -23,7 +23,7 @@ public class Question implements Serializable {
     public Question() {
 
     }
-    
+
     public String getAnswerText() {
         return answerText;
     }
@@ -93,6 +93,9 @@ public class Question implements Serializable {
     }
 
     public void addTurninformation(String user, Turninformation turninformation) {
+        if (this.turnInformation == null) {
+            this.turnInformation = new HashMap<>();
+        }
         this.turnInformation.put(user, turninformation);
     }
 
